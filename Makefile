@@ -8,7 +8,7 @@ CFLAGS = -g -Wall
 
 # Linker flags go here. Currently there aren't any, but if we'll switch to
 # code optimization, we might add "-s" here to strip debug info and symbols.
-LDFLAGS = -lopencv_core -lopencv_highgui -lopencv_contrib -lopencv_features2d -lopencv_imgproc -llinear -lsvm -ltiff
+LDFLAGS = -lopencv_core -lopencv_highgui -lopencv_contrib -lopencv_features2d -lopencv_imgproc -llinear -lsvm -ltiff -lpthread
 
 # use this command to erase files.
 RM = rm -f

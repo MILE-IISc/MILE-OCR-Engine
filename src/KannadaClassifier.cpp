@@ -20,6 +20,11 @@ using namespace std;
 #include <dirent.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <pthread.h>
+#include <unistd.h>
 
 #include "OCR_Util.h"
 #include "OCR_Akshara.h"
@@ -190,8 +195,6 @@ int performOCR(string imagePath, string imageName, vector<CvRect> *textBlocks = 
 	return 0;
 }
 
-
-
 string removeExtension(string fileNameFull) {
 	int indx = fileNameFull.rfind(".");
 	string fileName = fileNameFull.substr(0, indx);
@@ -259,6 +262,7 @@ static const string MENU_OPTION = "-menu";
 static const string IMG_OPTION = "-img";
 static const string MULTIPAGE_OPTION = "-multipage";
 static const string DIR_OPTION = "-dir";
+static const string SERVER_OPTION = "-server";
 //static const string XML_OPTION = "-xml";
 
 void printHelp() {
@@ -268,6 +272,7 @@ void printHelp() {
 	cout << "c) KannadaClassifier.exe " + DIR_OPTION + " <path_of_directory_containing_input_images>\n";
 	cout << "d) KannadaClassifier.exe " + string("<input_xml> <output.xml> <output_filename_prefix>\n");
 	cout << "e) KannadaClassifier.exe " + MENU_OPTION + "\n";
+	cout << "e) KannadaClassifier.exe " + SERVER_OPTION + "\n";
 }
 
 void printMenu() {
@@ -279,6 +284,58 @@ void printMenu() {
 	cout << "4: Run OCR with XML input and output files\n";
 	cout << "5: Quit\n";
 	cout << "\nEnter your choice number: ";
+}
+
+void* handleClient(void *arg) {
+	int socketId = ((unsigned long long)arg);
+	unsigned int filePrefix;
+	recv(socketId, &filePrefix, sizeof(filePrefix), 0);
+	printf("received -- %d\n", filePrefix);
+	close(socketId);
+	return NULL;
+}
+
+int getServerPortNumber() {
+#define DEFAULT_OCR_SERVER_PORT 8182
+	char *port = getenv("OCR_SERVER_PORT_NUMBER");
+	if (port == NULL) {
+		return DEFAULT_OCR_SERVER_PORT;
+	} else {
+		return atoi(port);
+	}
+}
+
+int startServer() {
+	int serverSocketId, clientSocketId;
+	struct sockaddr_in address;
+	int addrlen = sizeof(address);
+	pthread_t thread;
+	int serverPortNumber = getServerPortNumber();
+	// Creating socket file descriptor
+	if ((serverSocketId = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
+		perror("Server socket creation failed");
+		exit(EXIT_FAILURE);
+	}
+	address.sin_family = AF_INET;
+	address.sin_addr.s_addr = inet_addr("127.0.0.1");
+	address.sin_port = htons(serverPortNumber);
+
+	if (bind(serverSocketId, (struct sockaddr *)&address, sizeof(address)) < 0) {
+		perror("Server port bind failed");
+		exit(EXIT_FAILURE);
+	}
+	if (listen(serverSocketId, 3) < 0) {
+		perror("Setting server queue size failed");
+		exit(EXIT_FAILURE);
+	}
+	printf("Listening on port %d ...\n", serverPortNumber);
+	while(1) {
+		if ((clientSocketId = accept(serverSocketId, (struct sockaddr *)&address, (socklen_t*)&addrlen)) < 0) {
+			perror("Error while listening for socket connections");
+			exit(EXIT_FAILURE);
+		}
+		pthread_create(&thread, NULL, handleClient, (void*)clientSocketId);
+	}
 }
 
 void processArguments(int argc, char** argv) {
@@ -348,7 +405,8 @@ void processArguments(int argc, char** argv) {
 		handleDirOption(argv[2]);
 	} else if (argc == 4) {
 		handleXmlOption(argv[1], argv[2], argv[3]);
-
+	} else if (argc == 2 && subCommand == SERVER_OPTION) {
+		startServer();
 	} else {
 		printHelp();
 		exit(1);
