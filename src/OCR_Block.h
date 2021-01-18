@@ -1,9 +1,6 @@
 #ifndef OCR_BLOCK_H_
 #define OCR_BLOCK_H_
 
-#include <cxcore.h>
-#include <cv.h>
-#include <highgui.h>
 #include <fstream>
 #include "OCR_Util.h"
 #include "OCR_Line.h"

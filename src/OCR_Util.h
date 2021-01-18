@@ -7,9 +7,9 @@
 #include <string>
 #include <cstring>
 #include <fstream>
-#include <cxcore.h>
-#include <cv.h>
-#include <highgui.h>
+#include <opencv/cxcore.h>
+#include <opencv/cv.h>
+#include <opencv/highgui.h>
 #include <tiffio.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -23,7 +23,7 @@ using std::ifstream;
 using std::ofstream;
 
 #include "OCR_GlobalDef.h"
-#include <svm.h>
+#include <libsvm/svm.h>
 #include <linear.h>
 
 namespace IISc_KannadaClassifier {

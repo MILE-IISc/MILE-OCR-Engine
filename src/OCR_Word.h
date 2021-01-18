@@ -3,9 +3,6 @@
 
 #include <vector>
 #include <iostream>
-#include <cxcore.h>
-#include <cv.h>
-#include <highgui.h>
 #include "OCR_GlobalDef.h"
 #include "OCR_Util.h"
 #include "OCR_SegmentedComponent.h"

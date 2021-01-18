@@ -4,13 +4,9 @@
 #include <vector>
 #include <string>
 #include <sstream>
-#include <cxcore.h>
-#include <cv.h>
-#include <highgui.h>
 #include "OCR_Util.h"
 #include "OCR_ClassLabel.h"
 #include "OCR_Block.h"
-#include <svm.h>
 using std::vector;
 using std::string;
 using std::stringstream;

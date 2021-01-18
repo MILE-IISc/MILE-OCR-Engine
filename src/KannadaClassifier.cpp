@@ -16,11 +16,7 @@
 #include <string>
 #include <cmath>
 using namespace std;
-#include <cxcore.h>
-#include <cv.h>
-#include <highgui.h>
 #include <ctime>
-#include <tiffio.h>
 #include <dirent.h>
 #include <sys/stat.h>
 #include <sys/types.h>

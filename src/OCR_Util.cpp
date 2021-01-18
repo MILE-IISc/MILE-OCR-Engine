@@ -1,5 +1,4 @@
 #include "OCR_Util.h"
-#include <svm.h>
 
 namespace IISc_KannadaClassifier {
 

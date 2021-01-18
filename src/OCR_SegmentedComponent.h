@@ -2,14 +2,10 @@
 #define OCR_SEGMENTEDCOMPONENT_H_
 
 #include <string>
-#include <cxcore.h>
-#include <cv.h>
-#include <highgui.h>
 #include <cstdio>
 #include "OCR_GlobalDef.h"
 #include "OCR_Util.h"
 #include "OCR_ClassLabel.h"
-#include <svm.h>
 using std::string;
 
 namespace IISc_KannadaClassifier {

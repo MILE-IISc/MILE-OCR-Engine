@@ -2,9 +2,6 @@
 #define OCR_LINE_H_
 
 #include <vector>
-#include <cxcore.h>
-#include <cv.h>
-#include <highgui.h>
 #include "OCR_GlobalDef.h"
 #include "OCR_Util.h"
 #include "OCR_Word.h"
