@@ -1,0 +1,35 @@
+Missing classes:
+S (pluta) (nn_3_cropped.bmp)
+|| (nn_3_cropped.bmp)
+
+kPart (d_9_cropped.bmp) : kPart + aaDheergha = kaa
+_nPart (d_9_cropped.bmp) : _nPart + aaDheergha = _naa
+vPart (d_9_cropped.bmp) : vPart + aaDheergha = vaa (currently "vPart" is recognized as "e")
+_dPart (d_9_cropped.bmp) : _dPart + aaDheergha = _daa (currently "_dPart" is recognized as "yePart")
+LPart (d_9_cropped.bmp) : LPart + aaDheergha = Laa (currently "LPart" is recognized as "naalku")
+_tPart (d_9_cropped.bmp) : _tPart + aaDheergha = _taa (currently "_tPart" is recognized as "_taa")
+
+31 more classes:
+kPart, k1Part, gPart, g1Part
+chPart, ch1Part, jPart
+TPart, T1Part, DPart, D1Part, NPart(?)
+_tPart, _t1Part, _dPart, _d1Part, _nPart
+pPart(?), p1Part(?), bPart, b1Part
+rPart, _lPart, vPart, _shPart, ShPart(?), sPart(?), hPart, LPart (==naalku), rOldPart, LOldPart
+
+Confusion Pairs:
+(anuswara, sonne, zero) : Taken care at character-class level itself
+ombattu and arkaaOttu : Resolved in OCR_Word::verify()
+entu and _la : Resolved in OCR_Word::verify()
+eeLu/seven and question : Resolved in OCR_Word::verify()
+
+che -> Te (d_9_cropped.bmp)
+he -> Ne (d_9_cropped.bmp)
+La -> pipe (d_9_cropped.bmp) (AspectRatio should help here)
+mOttu -> TrOttu (d_9_cropped.bmp: line-9), paadam (d_9_cropped.bmp: line-11, 13, 15), T1Ottu (d_9_cropped.bmp: line-13)
+_ni -> si (d_9_cropped.bmp: line-10)
+_duu -> _do (d_9_cropped.bmp: line-12)
+
+dot -> comma (d_9_cropped.bmp)
+dot -> pipe (d_9_cropped.bmp: line-6)
+comma -> paadam (d_9_cropped.bmp: line-7)

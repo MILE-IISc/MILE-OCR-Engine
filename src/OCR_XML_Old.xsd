@@ -1,0 +1,199 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:element name="DOCUMENT">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="PAGE" maxOccurs="unbounded" />
+			</xs:sequence>
+			<xs:attribute name="mode" type="ModeType" />
+		</xs:complexType>
+	</xs:element>
+
+	<xs:simpleType name="ModeType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="singlepage" />
+			<xs:enumeration value="multiplepage" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:element name="PAGE">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="Skew" minOccurs="0" />
+				<xs:element ref="Binarization" minOccurs="0" />
+				<xs:element ref="TextNonText" minOccurs="0" />
+				<xs:element ref="Thinning" minOccurs="0" />
+				<xs:element ref="Thickening" minOccurs="0" />
+				<xs:element ref="PictureBlock" minOccurs="0" />
+				<xs:element ref="GraphicsBlock" minOccurs="0" />
+				<xs:element ref="TextBlock" minOccurs="0" />
+			</xs:sequence>
+			<xs:attribute name="ImageURI" type="xs:string" />
+			<xs:attribute name="ImageFormat" type="FormatType" />
+			<xs:attribute name="ImageWidth" type="xs:positiveInteger" />
+			<xs:attribute name="ImageHeight" type="xs:positiveInteger" />
+			<xs:attribute name="ImagePixelInfo" type="PixelInfoType" />
+			<xs:attribute name="ScanningResolution" type="AllowedResolutionValues" />
+			<xs:attribute name="NumberOfBitsPerPixel" type="xs:positiveInteger" />
+			<xs:attribute name="Script" type="ScriptType" />
+		</xs:complexType>
+	</xs:element>
+
+	<xs:simpleType name="FormatType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="ppm" />
+			<xs:enumeration value="pgm" />
+			<xs:enumeration value="jpg" />
+			<xs:enumeration value="bmp" />
+			<xs:enumeration value="tif" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="PixelInfoType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="GrayScale" />
+			<xs:enumeration value="Color" />
+			<xs:enumeration value="Binary" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="AllowedResolutionValues">
+		<xs:restriction base="xs:positiveInteger">
+			<xs:enumeration value="200" />
+			<xs:enumeration value="300" />
+			<xs:enumeration value="600" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="ScriptType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Devanagri" />
+			<xs:enumeration value="Bangla" />
+			<xs:enumeration value="Gujarati" />
+			<xs:enumeration value="Tamil" />
+			<xs:enumeration value="Telugu" />
+			<xs:enumeration value="Malayalam" />
+			<xs:enumeration value="Gurmukhi" />
+			<xs:enumeration value="Tibetan" />
+			<xs:enumeration value="Oriya" />
+			<xs:enumeration value="Kannada" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:group name="InputOutputImageURI">
+		<xs:sequence>
+			<xs:element name="InputImageURI" type="xs:string" />
+			<xs:element name="OutputImageURI" type="xs:string" />
+		</xs:sequence>
+	</xs:group>
+
+	<xs:element name="Skew">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:group ref="InputOutputImageURI" />
+			</xs:sequence>
+			<xs:attribute name="SkewAngle" type="xs:decimal" />
+			<xs:attribute name="AlgorithmName" type="xs:string" />
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="Binarization">
+
+		<xs:complexType>
+			<xs:sequence>
+				<xs:group ref="InputOutputImageURI" />
+			</xs:sequence>
+			<xs:attribute name="ThresholdValue" type="xs:decimal" />
+			<xs:attribute name="AlgorithmName" type="AlgoType" />
+		</xs:complexType>
+	</xs:element>
+
+	<xs:simpleType name="AlgoType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Adaptive" />
+			<xs:enumeration value="Morphological" />
+			<xs:enumeration value="Sauvola" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:element name="TextNonText">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:group ref="InputOutputImageURI" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="Thinning">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:group ref="InputOutputImageURI" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="Thickening">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:group ref="InputOutputImageURI" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:complexType name="SegmentedBlock">
+		<xs:sequence>
+			<xs:group ref="InputOutputImageURI" />
+			<xs:element ref="BLOCK" maxOccurs="unbounded" />
+		</xs:sequence>
+		<xs:attribute name="TotalNumber" type="xs:positiveInteger" />
+	</xs:complexType>
+
+	<xs:element name="PictureBlock" type="SegmentedBlock" />
+
+	<xs:element name="GraphicsBlock" type="SegmentedBlock" />
+
+	<xs:element name="TextBlock" type="SegmentedBlock" />
+
+	<xs:element name="Unicode">
+		<xs:complexType>
+			<xs:attribute name="FileURI" type="xs:string" />
+			<xs:attribute name="FontSize" type="xs:positiveInteger" />
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="TextLine">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="BLOCK" />
+			</xs:sequence>
+			<xs:attribute name="TotalNumber" type="xs:positiveInteger" />
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="TextWord">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="BLOCK" />
+			</xs:sequence>
+			<xs:attribute name="TotalNumber" type="xs:positiveInteger" />
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="BLOCK">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="topLx" type="xs:positiveInteger" />
+				<xs:element name="topLy" type="xs:positiveInteger" />
+				<xs:element name="bottomRx" type="xs:positiveInteger" />
+				<xs:element name="bottomRy" type="xs:positiveInteger" />
+				<xs:element ref="Unicode" minOccurs="0" />
+				<xs:element ref="TextLine" minOccurs="0" maxOccurs="unbounded" />
+				<xs:element ref="TextWord" minOccurs="0" maxOccurs="unbounded" />
+			</xs:sequence>
+			<xs:attribute name="Number" type="xs:positiveInteger" />
+			<xs:attribute name="SemanticLabel" type="xs:string" />
+		</xs:complexType>
+	</xs:element>
+
+</xs:schema>
