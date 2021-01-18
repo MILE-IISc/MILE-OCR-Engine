@@ -1,25 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <DOCUMENT>
-	<PAGE  ImageURI="/home/sandeep/Milesvnrepos/KannadaClassifier/test_xml/cdactest.tif"  ImageFormat="tif"  ImageWidth="0"  ImageHeight="0">
+	<PAGE ImageURI="test_xml/Original.TIF"  ImageFormat="tif"  ImageWidth="0"  ImageHeight="0">
 		<Binarization  ThresholdValue="160"  AlgorithmName="Morphological">
 			<InputImageURI>
-				/home/sandeep/Milesvnrepos/KannadaClassifier/test_xml/Binarized_Skewcorrected123.tif
+				test_xml/Original.TIF
 			</InputImageURI>
 			<OutputImageURI>
-				/home/sandeep/Milesvnrepos/KannadaClassifier/test_xml/Binarized_Skewcorrected1234.tif
+				test_xml/Binarized.tif
 			</OutputImageURI>
 		</Binarization>
 		<Skew  SkewAngle="0.000000"  AlgorithmName="MlSkew" >
 			<InputImageURI>
-				/home/sandeep/Milesvnrepos/KannadaClassifier/test_xml/Binarized_Skewcorrected12345.tif
+				test_xml/Binarized.tif
 			</InputImageURI>
 			<OutputImageURI>
-				/home/sandeep/Milesvnrepos/KannadaClassifier/test_xml/Binarized_Skewcorrected007.tif
+				test_xml/Binarized_Skewcorrected.tif
 			</OutputImageURI>
 		</Skew>
 	</PAGE>
 </DOCUMENT>
- <!-- -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-* -->
-
 

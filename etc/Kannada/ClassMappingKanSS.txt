@@ -1,0 +1,15 @@
+1,apostrophe
+2,colon
+3,comma
+4,dash
+5,div
+6,dot
+7,exclamation
+8,leftApostrophe
+9,lSqBracket
+10,pipe
+11,rightApostrophe
+12,rSqBracket
+13,semicolon
+14,tilde
+15,underscore
