@@ -287,10 +287,19 @@ void printMenu() {
 }
 
 void* handleClient(void *arg) {
+#define OCR_WORK_DIR "/tmp/ocr_work_dir"
+#define MAX_PATH_LEN 256
 	int socketId = ((unsigned long long)arg);
 	unsigned int filePrefix;
 	recv(socketId, &filePrefix, sizeof(filePrefix), 0);
 	printf("received -- %d\n", filePrefix);
+	char inputXmlPath[MAX_PATH_LEN];
+	snprintf(inputXmlPath, MAX_PATH_LEN, "%s/%d_input.xml", OCR_WORK_DIR, filePrefix);
+	char outputXmlPath[MAX_PATH_LEN];
+	snprintf(outputXmlPath, MAX_PATH_LEN, "%s/%d_output.xml", OCR_WORK_DIR, filePrefix);
+	char outputTextPath[MAX_PATH_LEN];
+	snprintf(outputTextPath, MAX_PATH_LEN, "%s/%d_output.txt", OCR_WORK_DIR, filePrefix);
+	handleXmlOption(inputXmlPath, outputXmlPath, outputTextPath);
 	close(socketId);
 	return NULL;
 }
