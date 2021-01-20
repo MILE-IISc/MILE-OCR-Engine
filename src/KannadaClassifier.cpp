@@ -57,7 +57,7 @@ int performOCR(string imagePath, string imageName, vector<CvRect> *textBlocks = 
 		}
 		loadClassLabels();
 		metaDataLoaded = true;
-	}else {
+	} else {
 		outFileLog << "\nRequired MetaData is already loaded into the memory\n";
 	}
 
@@ -249,7 +249,6 @@ void handleMultiPageTiffOption(string imagePath) {
 }
 
 void handleXmlOption(string inputXmlPath, string outputXmlPath, string outputFileNamePrefix) {
-
 	vector<CvRect> textBlocks;
 	string imagePath = parseInputXML(inputXmlPath, textBlocks);
 	if (imagePath.size() > 0) {
