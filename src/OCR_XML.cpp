@@ -172,4 +172,46 @@ void writeOutputXML(OCR_Page &page, char *inputXml, char *outputXml, string outp
 	//xmlParser->verifyAgainstSchema((char *) string("src" + PATH_SEPARATOR + "OCR_XML_Old.xsd").c_str());
 }
 
+void writeOcrOutputXML(OCR_Page &page, char* outputXmlPath) {
+	XMLDocument* doc = new XMLDocument();
+	XMLNode* pageElement = doc->InsertEndChild(doc->NewElement("page"));
+
+	vector<OCR_Block> &blocks = page.blocks;
+	for (unsigned int b = 0; b < blocks.size(); b++) {
+		XMLNode* blockElement = pageElement->InsertNewChildElement("block");
+		for (unsigned int l = 0; l < lines.size(); l++) {
+			XMLNode* lineElement = blockElement->InsertNewChildElement("line");
+			vector<OCR_Word> &words = lines[l].words;
+			for (unsigned int w = 0; w < words.size(); w++) {
+				XMLNode* wordElement = lineElement->InsertNewChildElement("word");
+				vector<OCR_Akshara> &aksharas = words[w].aksharas;
+				vector<wchar_t> unicodes;
+				for (unsigned int a = 0; a < aksharas.size(); a++) {
+					copyVector(aksharas[a].unicodes, unicodes);
+				}
+				wordElement->SetAttribute("unicode", toString(unicodes));
+				wordElement->SetAttribute("WordNumber", w + 1);
+			}
+			lineElement->SetAttribute("LineNumber", l + 1);
+		}
+		blockElement->SetAttribute("BlockNumber", b + 1);
+	}
+
+	doc->SaveFile(outputXmlPath);
+}
+
+void copyVector(vector<wchar_t> &fromVector, vector<wchar_t> &toVector) {
+	for (unsigned i = 0; i < fromVector.size(); i++) {
+		toVector.push_back(fromVector[i]);
+	}
+}
+
+wstring toString(vector<wchar_t> &unicodes) {
+	wstring output;
+	for (unsigned i = 0; i < unicodes.size(); i++) {
+		output.push_back(unicodes[i]);
+	}
+	return output;
+}
+
 }
