@@ -27,9 +27,16 @@ void writeOcrOutputXML(OCR_Page &page, const char* outputXmlPath) {
 			XMLElement* lineElement = blockElement->InsertNewChildElement("line");
 			OCR_Line &line = lines[l];
 			vector<OCR_Word> &words = line.words;
+			int lineColStart = 0, lineColEnd = 0;
 			for (unsigned int w = 0; w < words.size(); w++) {
 				XMLElement* wordElement = lineElement->InsertNewChildElement("word");
 				OCR_Word &word = words[w];
+				if (w == 0) {
+					lineColStart = word.xStart;
+				}
+				if (w == words.size() - 1) {
+					lineColEnd = word.xEnd;
+				}
 				vector<OCR_Akshara> &aksharas = word.aksharas;
 				vector<wchar_t> unicodes;
 				for (unsigned int a = 0; a < aksharas.size(); a++) {
@@ -45,6 +52,8 @@ void writeOcrOutputXML(OCR_Page &page, const char* outputXmlPath) {
 			lineElement->SetAttribute("LineNumber", lineNumber++);
 			lineElement->SetAttribute("rowStart", line.lineTop);
 			lineElement->SetAttribute("rowEnd", line.lineBottom);
+			lineElement->SetAttribute("colStart", lineColStart);
+			lineElement->SetAttribute("colEnd", lineColEnd);
 		}
 		blockElement->SetAttribute("BlockNumber", b + 1);
 		blockElement->SetAttribute("type", "Text");
