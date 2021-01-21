@@ -12,7 +12,7 @@ namespace IISc_KannadaClassifier {
 string parseInputXML(string inputxml, vector<CvRect> &textBlocks);
 void writeOutputXML(OCR_Page &page, char* inputXml, char* outputXml, string outputFileNamePrefix,
 		char *inputImageUri);
-void writeOcrOutputXML(OCR_Page &page, char* outputXmlPath);
+void writeOcrOutputXML(OCR_Page &page, const char* outputXmlPath);
 
 }
 

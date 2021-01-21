@@ -170,9 +170,11 @@ int performOCR(string imagePath, string imageName, vector<CvRect> *textBlocks = 
 		if (outputFileNamePrefix == NULL || outputFileNamePrefix == "") {
 			outputFileName = imageDir + PATH_SEPARATOR + "output"+ ".txt";
 		} else {
-			outputFileName = outputFileNamePrefix;//imageDir + PATH_SEPARATOR +string(extractFileName(outputFileNamePrefix))                  ;
+			outputFileName = outputFileNamePrefix;//imageDir + PATH_SEPARATOR +string(extractFileName(outputFileNamePrefix));
 		}
 		blocks[b].writeUnicodesToFile(outputFileName);
+		string xmlFileName = imageDir + PATH_SEPARATOR + "output"+ ".xml";
+		writeOcrOutputXML(page, xmlFileName.c_str());
 	}
 	clock_t cEnd = clock();
 	double timeInSecs = (cEnd - cBegin) / (float) CLOCKS_PER_SEC;

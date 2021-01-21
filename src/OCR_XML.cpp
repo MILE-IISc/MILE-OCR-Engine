@@ -181,7 +181,7 @@ wstring vectorToString(vector<wchar_t> &unicodes) {
 	return output;
 }
 
-void writeOcrOutputXML(OCR_Page &page, char* outputXmlPath) {
+void writeOcrOutputXML(OCR_Page &page, const char* outputXmlPath) {
 	XMLDocument* doc = new XMLDocument();
 	XMLElement* pageElement = doc->NewElement("page");
 	doc->InsertEndChild(pageElement);
