@@ -167,7 +167,7 @@ int performOCR(string imagePath, string imageName, vector<CvRect> *textBlocks = 
 
 		//Save unicode for each text block.
 		string outputFileName;
-		if (outputFileNamePrefix == NULL || outputFileNamePrefix == "") {
+		if (outputFileNamePrefix == NULL || strcmp(outputFileNamePrefix, "") == 0) {
 			outputFileName = imageDir + PATH_SEPARATOR + "output"+ ".txt";
 		} else {
 			outputFileName = outputFileNamePrefix;//imageDir + PATH_SEPARATOR +string(extractFileName(outputFileNamePrefix));
@@ -181,7 +181,7 @@ int performOCR(string imagePath, string imageName, vector<CvRect> *textBlocks = 
 	cout << "Segmentation+Classification+UnicodeGeneration complete. Time spent on = " << timeInSecs << "secs\n";
 	outFileLog << "Segmentation+Classification+UnicodeGeneration complete. Time spent = " << timeInSecs << "secs\n";
 
-	if (outputXml != NULL && outputXml != "") {
+	if (outputXml != NULL &&  strcmp(outputXml, "") == 0) {
 		writeOcrOutputXML(page, outputXml);
 	}
 	cvReleaseImage(&img);
