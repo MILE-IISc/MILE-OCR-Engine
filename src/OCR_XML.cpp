@@ -1,5 +1,6 @@
 #include "OCR_XML.h"
 
+using namespace tinyxml2;
 namespace IISc_KannadaClassifier {
 
 string parseInputXML(string inputxml, vector<CvRect> &textBlocks) {
@@ -172,24 +173,34 @@ void writeOutputXML(OCR_Page &page, char *inputXml, char *outputXml, string outp
 	//xmlParser->verifyAgainstSchema((char *) string("src" + PATH_SEPARATOR + "OCR_XML_Old.xsd").c_str());
 }
 
+wstring vectorToString(vector<wchar_t> &unicodes) {
+	wstring output;
+	for (unsigned i = 0; i < unicodes.size(); i++) {
+		output.push_back(unicodes[i]);
+	}
+	return output;
+}
+
 void writeOcrOutputXML(OCR_Page &page, char* outputXmlPath) {
 	XMLDocument* doc = new XMLDocument();
-	XMLNode* pageElement = doc->InsertEndChild(doc->NewElement("page"));
+	XMLElement* pageElement = doc->NewElement("page");
+	doc->InsertEndChild(pageElement);
 
 	vector<OCR_Block> &blocks = page.blocks;
 	for (unsigned int b = 0; b < blocks.size(); b++) {
-		XMLNode* blockElement = pageElement->InsertNewChildElement("block");
+		XMLElement* blockElement = pageElement->InsertNewChildElement("block");
+		vector<OCR_Line> &lines = blocks[b].lines;
 		for (unsigned int l = 0; l < lines.size(); l++) {
-			XMLNode* lineElement = blockElement->InsertNewChildElement("line");
+			XMLElement* lineElement = blockElement->InsertNewChildElement("line");
 			vector<OCR_Word> &words = lines[l].words;
 			for (unsigned int w = 0; w < words.size(); w++) {
-				XMLNode* wordElement = lineElement->InsertNewChildElement("word");
+				XMLElement* wordElement = lineElement->InsertNewChildElement("word");
 				vector<OCR_Akshara> &aksharas = words[w].aksharas;
 				vector<wchar_t> unicodes;
 				for (unsigned int a = 0; a < aksharas.size(); a++) {
 					copyVector(aksharas[a].unicodes, unicodes);
 				}
-				wordElement->SetAttribute("unicode", toString(unicodes));
+				// wordElement->SetAttribute("unicode", vectorToString(unicodes));
 				wordElement->SetAttribute("WordNumber", w + 1);
 			}
 			lineElement->SetAttribute("LineNumber", l + 1);
@@ -198,20 +209,6 @@ void writeOcrOutputXML(OCR_Page &page, char* outputXmlPath) {
 	}
 
 	doc->SaveFile(outputXmlPath);
-}
-
-void copyVector(vector<wchar_t> &fromVector, vector<wchar_t> &toVector) {
-	for (unsigned i = 0; i < fromVector.size(); i++) {
-		toVector.push_back(fromVector[i]);
-	}
-}
-
-wstring toString(vector<wchar_t> &unicodes) {
-	wstring output;
-	for (unsigned i = 0; i < unicodes.size(); i++) {
-		output.push_back(unicodes[i]);
-	}
-	return output;
 }
 
 }

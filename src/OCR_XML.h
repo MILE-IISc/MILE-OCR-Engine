@@ -5,6 +5,7 @@
 #include "OCR_Util.h"
 #include "OCR_Page.h"
 #include "xmlParser.h"
+#include "tinyxml2.h"
 
 namespace IISc_KannadaClassifier {
 
