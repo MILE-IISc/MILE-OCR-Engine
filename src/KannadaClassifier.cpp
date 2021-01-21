@@ -159,18 +159,13 @@ int performOCR(string imagePath, string imageName, vector<CvRect> *textBlocks = 
 				outFileLog << "\n";
 			}
 		}
-        //Save unicode for each text block.
-		/*string outputFileName;
-		outputFileName = imageDir+ PATH_SEPARATOR + "B_" + toString(b + 1) + ".txt";
-		blocks[b].writeUnicodesToFile(outputFileName);*/
-
-
-		//Save unicode for each text block.
+		// Save unicode for each text block.
 		string outputFileName;
 		if (outputFileNamePrefix == NULL || strcmp(outputFileNamePrefix, "") == 0) {
 			outputFileName = imageDir + PATH_SEPARATOR + "output"+ ".txt";
 		} else {
-			outputFileName = outputFileNamePrefix;//imageDir + PATH_SEPARATOR +string(extractFileName(outputFileNamePrefix));
+			outputFileName = outputFileNamePrefix;
+			// imageDir + PATH_SEPARATOR + string(extractFileName(outputFileNamePrefix));
 		}
 		blocks[b].writeUnicodesToFile(outputFileName);
 		string xmlFileName = imageDir + PATH_SEPARATOR + "output"+ ".xml";
