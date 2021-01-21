@@ -1,6 +1,7 @@
 #include "OCR_XML.h"
 
 using namespace tinyxml2;
+using namespace std;
 
 namespace IISc_KannadaClassifier {
 
@@ -27,7 +28,7 @@ void writeOcrOutputXML(OCR_Page &page, const char* outputXmlPath) {
 				for (unsigned int a = 0; a < aksharas.size(); a++) {
 					copyVector(aksharas[a].unicodes, unicodes);
 				}
-				// wordElement->SetAttribute("unicode", vectorToString(unicodes));
+				wordElement->SetAttribute("unicode", toString(unicodes).c_str());
 				wordElement->SetAttribute("WordNumber", w + 1);
 			}
 			lineElement->SetAttribute("LineNumber", l + 1);
