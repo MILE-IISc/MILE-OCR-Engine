@@ -12,6 +12,8 @@ char* itoa(unsigned int num) {
 void writeOcrOutputXML(OCR_Page &page, const char* outputXmlPath) {
 	XMLDocument* doc = new XMLDocument();
 	XMLElement* pageElement = doc->NewElement("page");
+	pageElement->SetAttribute("xmlns", "http://mile.ee.iisc.ernet.in/schemas/ocr_output");
+	pageElement->SetAttribute("skew", page.skewCorrected);
 	doc->InsertEndChild(pageElement);
 
 	vector<OCR_Block> &blocks = page.blocks;
@@ -44,6 +46,7 @@ void writeOcrOutputXML(OCR_Page &page, const char* outputXmlPath) {
 			lineElement->SetAttribute("rowEnd", line.lineBottom);
 		}
 		blockElement->SetAttribute("BlockNumber", b + 1);
+		blockElement->SetAttribute("type", "Text");
 		blockElement->SetAttribute("rowStart", block.boundingBox.y);
 		blockElement->SetAttribute("rowEnd", block.boundingBox.y + block.boundingBox.height - 1);
 		blockElement->SetAttribute("colStart", block.boundingBox.x);

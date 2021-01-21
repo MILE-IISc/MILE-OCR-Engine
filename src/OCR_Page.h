@@ -19,6 +19,7 @@ public:
 	IplImage *img;
 	vector<OCR_Block> blocks;
 	bool isBlockSegmented;
+	double skewCorrected;
 	OCR_Page(IplImage *_img);
 	virtual ~OCR_Page();
 	void binarize();

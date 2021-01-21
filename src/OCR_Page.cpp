@@ -4,6 +4,7 @@ namespace IISc_KannadaClassifier {
 
 OCR_Page::OCR_Page(IplImage *_img) {
 	img = _img;
+	skewCorrected = 0.0;
 }
 
 OCR_Page::~OCR_Page() {
@@ -273,6 +274,7 @@ void OCR_Page::skewCorrect() {
 
 	if (fabs(skew) > fabs(SKEW_ANGLE_TO_IGNORE)) {
 		// Skew Correction based on Affine Transform
+		skewCorrected = skew;
 		cout << "Performing Skew Correction... ";
 		outFileLog << "\nPerforming Skew Correction...\n";
 		cBegin = clock();
