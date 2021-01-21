@@ -11,6 +11,7 @@ char* itoa(unsigned int num) {
 
 void writeOcrOutputXML(OCR_Page &page, const char* outputXmlPath) {
 	XMLDocument* doc = new XMLDocument();
+	doc->InsertEndChild(doc->NewDeclaration(NULL));
 	XMLElement* pageElement = doc->NewElement("page");
 	pageElement->SetAttribute("xmlns", "http://mile.ee.iisc.ernet.in/schemas/ocr_output");
 	pageElement->SetAttribute("skew", page.skewCorrected);
