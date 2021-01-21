@@ -182,7 +182,7 @@ int performOCR(string imagePath, string imageName, vector<CvRect> *textBlocks = 
 	outFileLog << "Segmentation+Classification+UnicodeGeneration complete. Time spent = " << timeInSecs << "secs\n";
 
 	if (outputXml != NULL && outputXml != "") {
-		writeOutputXML(page, inputXml, outputXml, outputFileNamePrefix, (char *) imagePath.c_str());
+		writeOcrOutputXML(page, outputXml);
 	}
 	cvReleaseImage(&img);
 
@@ -250,21 +250,11 @@ void handleMultiPageTiffOption(string imagePath) {
 	}
 }
 
-void handleXmlOption(string inputXmlPath, string outputXmlPath, string outputFileNamePrefix) {
-	vector<CvRect> textBlocks;
-	string imagePath = parseInputXML(inputXmlPath, textBlocks);
-	if (imagePath.size() > 0) {
-		performOCR(imagePath, extractFileName(imagePath), &textBlocks, (char *) outputFileNamePrefix.c_str(),
-				(char *) inputXmlPath.c_str(), (char *) outputXmlPath.c_str());
-	}
-}
-
 static const string MENU_OPTION = "-menu";
 static const string IMG_OPTION = "-img";
 static const string MULTIPAGE_OPTION = "-multipage";
 static const string DIR_OPTION = "-dir";
 static const string SERVER_OPTION = "-server";
-//static const string XML_OPTION = "-xml";
 
 void printHelp() {
 	cout << "Please invoke the program in one of the following ways:\n";
@@ -282,8 +272,7 @@ void printMenu() {
 	cout << "1: Run OCR on an input image\n";
 	cout << "2: Run OCR on a multi-page TIFF input image\n";
 	cout << "3: Run OCR on all images in a directory\n";
-	cout << "4: Run OCR with XML input and output files\n";
-	cout << "5: Quit\n";
+	cout << "4: Quit\n";
 	cout << "\nEnter your choice number: ";
 }
 
@@ -294,13 +283,13 @@ void* handleClient(void *arg) {
 	unsigned int filePrefix;
 	recv(socketId, &filePrefix, sizeof(filePrefix), 0);
 	printf("received -- %d\n", filePrefix);
-	char inputXmlPath[MAX_PATH_LEN];
+	/*char inputXmlPath[MAX_PATH_LEN];
 	snprintf(inputXmlPath, MAX_PATH_LEN, "%s/%d_input.xml", OCR_WORK_DIR, filePrefix);
 	char outputXmlPath[MAX_PATH_LEN];
 	snprintf(outputXmlPath, MAX_PATH_LEN, "%s/%d_output.xml", OCR_WORK_DIR, filePrefix);
 	char outputTextPath[MAX_PATH_LEN];
 	snprintf(outputTextPath, MAX_PATH_LEN, "%s/%d_output.txt", OCR_WORK_DIR, filePrefix);
-	handleXmlOption(inputXmlPath, outputXmlPath, outputTextPath);
+	handleXmlOption(inputXmlPath, outputXmlPath, outputTextPath);*/
 	close(socketId);
 	return NULL;
 }
@@ -389,17 +378,6 @@ void processArguments(int argc, char** argv) {
 				cin >> tempStr;
 				break;
 			case 4:
-				cout << "\nEnter the path of input xml: ";
-				cin >> inputXml;
-				cout << "\nEnter the path where output xml must be stored: ";
-				cin >> outputXml;
-				cout << "\nEnter the prefix for unicode output files: ";
-				cin >> outputPrefix;
-				handleXmlOption(inputXml, outputXml, outputPrefix);
-				cout << "\nPress any key followed by Enter to continue\n";
-				cin >> tempStr;
-				break;
-			case 5:
 				cout << "Thanks for using the Kannada OCR developed by MILE Lab, IISc.";
 				cout << "\nThe program will quit now...\n";
 				break;
@@ -413,8 +391,6 @@ void processArguments(int argc, char** argv) {
 		handleMultiPageTiffOption(argv[2]);
 	} else if (argc == 3 && subCommand == DIR_OPTION) {
 		handleDirOption(argv[2]);
-	} else if (argc == 4) {
-		handleXmlOption(argv[1], argv[2], argv[3]);
 	} else if (argc == 2 && subCommand == SERVER_OPTION) {
 		startServer();
 	} else {
