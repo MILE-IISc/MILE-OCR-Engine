@@ -288,7 +288,6 @@ void OCR_Word::splitMergedCharacters() {
 	vector<OCR_SegmentedComponent> newSegmentedComponents;
 	for (unsigned int c = 0; c < segmentedComponents.size(); c++) {
 		bool isOttuTowardsLeft, isOttuTowardsRight;
-		cvSaveImage("testt.tif", segmentedComponents[c].img);
 		if (!segmentedComponents[c].isBaseAndOttuMerged(relBaseLine, lineHeight, isOttuTowardsLeft,
 				isOttuTowardsRight)) {
 			newSegmentedComponents.push_back(segmentedComponents[c]);
@@ -369,7 +368,6 @@ void OCR_Word::splitMergedCharacters() {
 			}
 
 		}
-		cvSaveImage("testtLcut.tif", segmentedComponents[c].img);
 
 		// Extract the CC in the image corresponding to ottu.
 		IplImage* tempImg1 = cvCloneImage(tempImg);

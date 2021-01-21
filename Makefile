@@ -11,7 +11,7 @@ CFLAGS = -g -Wall
 LDFLAGS = -lopencv_core -lopencv_highgui -lopencv_contrib -lopencv_features2d -lopencv_imgproc -llinear -lsvm -ltiff -lpthread
 
 # use this command to erase files.
-RM = rm -f
+RM = rm -rf
 # list of generated object files.
 OBJS = tinyxml2.o OCR_Util.o OCR_ClassLabel.o OCR_Akshara.o OCR_SegmentedComponent.o OCR_Word.o OCR_Line.o OCR_Block.o OCR_Page.o OCR_XML.o KannadaClassifier.o xmlParser.o
 
@@ -31,4 +31,4 @@ KannadaClassifier.exe: $(OBJS)
 
 # rule for cleaning re-compilable files.
 clean:
-	$(RM) $(PROG) $(OBJS)
+	$(RM) $(PROG) $(OBJS) output
