@@ -90,6 +90,10 @@ void displayImage(IplImage* img, char* windowLabel);
 
 void copyVector(vector<wchar_t> &fromVector, vector<wchar_t> &toVector);
 
+unsigned int wcharToUTF8(wchar_t unicode, unsigned char* ch);
+
+string toString(vector<wchar_t> &unicodes);
+
 string toString(unsigned int i);
 
 void resizeSpecialSymbol(IplImage* src, IplImage* dst);

@@ -443,6 +443,44 @@ void resizeSpecialSymbol(IplImage* src, IplImage* dst) {
 	cvReleaseImage(&tempImg);
 }
 
+unsigned int wcharToUTF8(wchar_t unicode, unsigned char* ch) {
+	union {
+		unsigned char unsignedCharValue[2];
+		unsigned short int unsignedIntValue;
+	} adapter;
+	adapter.unsignedCharValue[0] = unicode % 0X100;
+	adapter.unsignedCharValue[1] = unicode / 0X100;
+	unsigned int length;
+	if (adapter.unsignedIntValue < 0x0080) {
+		ch[0] = adapter.unsignedCharValue[0];
+		length = 1;
+	} else if (adapter.unsignedIntValue < 0x0800) {
+		ch[0] = 0xc0 | ((adapter.unsignedIntValue) >> 6);
+		ch[1] = 0x80 | ((adapter.unsignedIntValue) & 0x3f);
+		length = 2;
+	} else {
+		ch[0] = 0xe0 | ((adapter.unsignedIntValue) >> 12);
+		ch[1] = 0x80 | (((adapter.unsignedIntValue) >> 6) & 0x3f);
+		ch[2] = 0x80 | ((adapter.unsignedIntValue) & 0x3f);
+		length = 3;
+	}
+	return length;
+}
+
+string toString(vector<wchar_t> &unicodes) {
+	stringstream ss;
+	unsigned char ch[3];
+	for (unsigned int i = 0; i < unicodes.size(); i++) {
+		unsigned int len = wcharToUTF8(unicodes[i], ch);
+		for (unsigned int j = 0; j < len; j++) {
+			ss << ch[j];
+		}
+	}
+	string s;
+	ss >> s;
+	return s;
+}
+
 string toString(unsigned int i) {
 	stringstream ss;
 	ss << i;
