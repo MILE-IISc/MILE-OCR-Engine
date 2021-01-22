@@ -109,6 +109,8 @@ int performOCR(string imagePath, string imageName, vector<CvRect> *textBlocks = 
 	vector<OCR_Block> &blocks = page.blocks;
 	for (unsigned int b = 0; b < blocks.size(); b++) {
 		outFileLog << "Block " << (b + 1) << ": ";
+		CvRect &cvRect = blocks[b].boundingBox;
+		outFileLog << "x=" << cvRect.x << ", y=" << cvRect.y << ", width=" << cvRect.width << ", height=" << cvRect.height << "\n";
 		blocks[b].segmentLines();
 		blocks[b].saveSegmentedLines(b);
 		vector<OCR_Line> &lines = blocks[b].lines;

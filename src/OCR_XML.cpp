@@ -15,7 +15,6 @@ int readBlocksFromXML(const char* inputXmlPath, CvRect *textBlocks) {
 		int rowEnd = blockElement->IntAttribute("rowEnd");
 		int colStart = blockElement->IntAttribute("colStart");
 		int colEnd = blockElement->IntAttribute("colEnd");
-		cout << "(" << colStart << ", " << rowStart << ") -> (" << colEnd << ", " << rowEnd << ")\n";
 		CvRect *cvRect = &textBlocks[b];
 		cvRect->x = colStart;
 		cvRect->y = rowStart;
