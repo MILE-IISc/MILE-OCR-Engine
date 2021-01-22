@@ -40,7 +40,7 @@ using namespace IISc_KannadaClassifier;
 bool metaDataLoaded = false;
 
 int performOCR(string imagePath, string imageName, vector<CvRect> *textBlocks = NULL,
-		char *outputFileNamePrefix = NULL, char *inputXml = NULL, char *outputXml = NULL) {
+		char *outputFileNamePrefix = NULL, const char *outputXml = NULL) {
 	clock_t cBegin_main = clock();
 	imageDir = "output" + PATH_SEPARATOR + imageName + PATH_SEPARATOR;
 	makeDirectory("output");
@@ -178,7 +178,7 @@ int performOCR(string imagePath, string imageName, vector<CvRect> *textBlocks = 
 	cout << "Segmentation+Classification+UnicodeGeneration complete. Time spent on = " << timeInSecs << "secs\n";
 	outFileLog << "Segmentation+Classification+UnicodeGeneration complete. Time spent = " << timeInSecs << "secs\n";
 
-	if (outputXml != NULL &&  strcmp(outputXml, "") == 0) {
+	if (outputXml != NULL &&  strcmp(outputXml, "") != 0) {
 		writeOcrOutputXML(page, outputXml);
 	} else {
 		string xmlFileName = imageDir + PATH_SEPARATOR + "output"+ ".xml";
@@ -203,18 +203,17 @@ string removeExtension(string fileNameFull) {
 	return fileName;
 }
 
-void handleImageOption(string imagePath, const char *blockXmlPath = NULL) {
+void handleImageOption(string imagePath, const char *blockXmlPath = NULL, const char *outputXmlPath = NULL) {
+	int blockCount = 0;
+	vector<CvRect> textBlocksVector;
 	if (blockXmlPath != NULL) {
 		CvRect textBlocks[100];
-		int blockCount = readBlocksFromXML(blockXmlPath, textBlocks);
-		vector<CvRect> textBlocksVector;
+		blockCount = readBlocksFromXML(blockXmlPath, textBlocks);
 		for (int b = 0; b < blockCount; b++) {
 			textBlocksVector.push_back(textBlocks[b]);
 		}
-		performOCR(imagePath, extractFileName(imagePath), blockCount > 0 ? &textBlocksVector : NULL);
-	} else {
-		performOCR(imagePath, extractFileName(imagePath));
 	}
+	performOCR(imagePath, extractFileName(imagePath), blockCount > 0 ? &textBlocksVector : NULL, NULL, outputXmlPath);
 }
 
 void handleDirOption(string baseDir) {
@@ -293,13 +292,16 @@ void* handleClient(void *arg) {
 	unsigned int filePrefix;
 	recv(socketId, &filePrefix, sizeof(filePrefix), 0);
 	printf("received -- %d\n", filePrefix);
-	/*char inputXmlPath[MAX_PATH_LEN];
+
+
+	char inputImagePath[MAX_PATH_LEN];
+	snprintf(inputImagePath, MAX_PATH_LEN, "%s/%d.tif", OCR_WORK_DIR, filePrefix);
+	char inputXmlPath[MAX_PATH_LEN];
 	snprintf(inputXmlPath, MAX_PATH_LEN, "%s/%d_input.xml", OCR_WORK_DIR, filePrefix);
 	char outputXmlPath[MAX_PATH_LEN];
 	snprintf(outputXmlPath, MAX_PATH_LEN, "%s/%d_output.xml", OCR_WORK_DIR, filePrefix);
-	char outputTextPath[MAX_PATH_LEN];
-	snprintf(outputTextPath, MAX_PATH_LEN, "%s/%d_output.txt", OCR_WORK_DIR, filePrefix);
-	handleXmlOption(inputXmlPath, outputXmlPath, outputTextPath);*/
+	handleImageOption(inputImagePath, inputXmlPath, outputXmlPath);
+
 	close(socketId);
 	return NULL;
 }
