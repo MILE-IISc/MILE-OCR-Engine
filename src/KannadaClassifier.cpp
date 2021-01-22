@@ -200,9 +200,13 @@ string removeExtension(string fileNameFull) {
 
 void handleImageOption(string imagePath, const char *blockXmlPath = NULL) {
 	if (blockXmlPath != NULL) {
-		vector<CvRect> *textBlocks = new vector<CvRect>;
-		readBlocksFromXML(blockXmlPath, textBlocks);
-		performOCR(imagePath, extractFileName(imagePath), textBlocks);
+		CvRect textBlocks[100];
+		int blockCount = readBlocksFromXML(blockXmlPath, textBlocks);
+		vector<CvRect> textBlocksVector;
+		for (int b = 0; b < blockCount; b++) {
+			textBlocksVector.push_back(textBlocks[b]);
+		}
+		performOCR(imagePath, extractFileName(imagePath), blockCount > 0 ? &textBlocksVector : NULL);
 	} else {
 		performOCR(imagePath, extractFileName(imagePath));
 	}

@@ -5,18 +5,26 @@ using namespace std;
 
 namespace IISc_KannadaClassifier {
 
-void readBlocksFromXML(const char* inputXmlPath, vector<CvRect> *textBlocks) {
+int readBlocksFromXML(const char* inputXmlPath, CvRect *textBlocks) {
 	XMLDocument doc;
 	doc.LoadFile(inputXmlPath);
 	XMLElement* blockElement = doc.FirstChildElement("page")->FirstChildElement("block");
+	int b = 0;
 	while (blockElement != 0) {
 		int rowStart = blockElement->IntAttribute("rowStart");
 		int rowEnd = blockElement->IntAttribute("rowEnd");
 		int colStart = blockElement->IntAttribute("colStart");
 		int colEnd = blockElement->IntAttribute("colEnd");
-		textBlocks->push_back(cvRect(colStart, rowStart, colEnd - colStart + 1, rowEnd - rowStart + 1));
+		cout << "(" << colStart << ", " << rowStart << ") -> (" << colEnd << ", " << rowEnd << ")\n";
+		CvRect *cvRect = &textBlocks[b];
+		cvRect->x = colStart;
+		cvRect->y = rowStart;
+		cvRect->width = colEnd - colStart + 1;
+		cvRect->height = rowEnd - rowStart + 1;
 		blockElement = blockElement->NextSiblingElement("block");
+		b++;
 	}
+	return b;
 }
 
 void writeOcrOutputXML(OCR_Page &page, const char* outputXmlPath) {

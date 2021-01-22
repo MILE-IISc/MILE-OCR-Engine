@@ -7,7 +7,7 @@
 
 namespace IISc_KannadaClassifier {
 
-void readBlocksFromXML(const char* inputXmlPath, vector<CvRect> *textBlocks);
+int readBlocksFromXML(const char* inputXmlPath, CvRect *textBlocks);
 void writeOcrOutputXML(OCR_Page &page, const char* outputXmlPath);
 
 }
