@@ -164,14 +164,12 @@ int performOCR(string imagePath, string imageName, vector<CvRect> *textBlocks = 
 		// Save unicode for each text block.
 		string outputFileName;
 		if (outputFileNamePrefix == NULL || strcmp(outputFileNamePrefix, "") == 0) {
-			outputFileName = imageDir + PATH_SEPARATOR + "output"+ ".txt";
+			outputFileName = imageDir + PATH_SEPARATOR + "output_"+ (b + 1) + ".txt";
 		} else {
 			outputFileName = outputFileNamePrefix;
 			// imageDir + PATH_SEPARATOR + string(extractFileName(outputFileNamePrefix));
 		}
 		blocks[b].writeUnicodesToFile(outputFileName);
-		string xmlFileName = imageDir + PATH_SEPARATOR + "output"+ ".xml";
-		writeOcrOutputXML(page, xmlFileName.c_str());
 	}
 	clock_t cEnd = clock();
 	double timeInSecs = (cEnd - cBegin) / (float) CLOCKS_PER_SEC;
@@ -180,6 +178,9 @@ int performOCR(string imagePath, string imageName, vector<CvRect> *textBlocks = 
 
 	if (outputXml != NULL &&  strcmp(outputXml, "") == 0) {
 		writeOcrOutputXML(page, outputXml);
+	} else {
+		string xmlFileName = imageDir + PATH_SEPARATOR + "output"+ ".xml";
+		writeOcrOutputXML(page, xmlFileName.c_str());
 	}
 	cvReleaseImage(&img);
 
