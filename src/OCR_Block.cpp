@@ -118,7 +118,7 @@ void OCR_Block::segmentLines() {
 				blockStart = lineBreak + 1;
 			}
 		} else {
-			lines.push_back(OCR_Line(img, seqStart[i], seqEnd[i] + 1));
+			lines.push_back(OCR_Line(img, seqStart[i], seqEnd[i]));
 		}
 	}
 	seqStart.clear(); //free memory
