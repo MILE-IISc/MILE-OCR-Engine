@@ -164,7 +164,9 @@ int performOCR(string imagePath, string imageName, vector<CvRect> *textBlocks = 
 		// Save unicode for each text block.
 		string outputFileName;
 		if (outputFileNamePrefix == NULL || strcmp(outputFileNamePrefix, "") == 0) {
-			outputFileName = imageDir + PATH_SEPARATOR + "output_"+ (b + 1) + ".txt";
+			stringstream ss;
+			ss <<  imageDir << PATH_SEPARATOR << "output_" << (b + 1) << ".txt";
+			outputFileName = ss.str().c_str();
 		} else {
 			outputFileName = outputFileNamePrefix;
 			// imageDir + PATH_SEPARATOR + string(extractFileName(outputFileNamePrefix));
