@@ -4,3 +4,6 @@
 output/
 *.tif*
 .vscode
+/.project
+/.cproject
+src/xmltest.cpp
