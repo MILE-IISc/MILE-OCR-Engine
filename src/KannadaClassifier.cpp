@@ -88,16 +88,16 @@ int performOCR(string imagePath, string imageName, vector<CvRect> *textBlocks = 
 	}
 
 	OCR_Page page = OCR_Page(img);
+	page.binarize();
 	if (textBlocks != NULL && textBlocks->size() > 0) {
 		page.isBlockSegmented = true;
-		if (isImageBackgroundWhite(page.img)) {
-			invertImage(page.img);
-		}
+		// if (isImageBackgroundWhite(page.img)) {
+		// 	invertImage(page.img);
+		// }
 		for (unsigned int b = 0; b < textBlocks->size(); b++) {
 			page.addTextBlock((*textBlocks)[b]);
 		}
 	} else {
-		page.binarize();
 		page.skewCorrect();
 		page.extractTextBlocks();
 		page.saveSegmentedTextBlocks();
@@ -198,8 +198,14 @@ string removeExtension(string fileNameFull) {
 	return fileName;
 }
 
-void handleImageOption(string imagePath) {
-	performOCR(imagePath, extractFileName(imagePath));
+void handleImageOption(string imagePath, const char *blockXmlPath = NULL) {
+	if (blockXmlPath != NULL) {
+		vector<CvRect> *textBlocks = new vector<CvRect>;
+		readBlocksFromXML(blockXmlPath, textBlocks);
+		performOCR(imagePath, extractFileName(imagePath), textBlocks);
+	} else {
+		performOCR(imagePath, extractFileName(imagePath));
+	}
 }
 
 void handleDirOption(string baseDir) {
@@ -253,7 +259,7 @@ static const string SERVER_OPTION = "-server";
 
 void printHelp() {
 	cout << "Please invoke the program in one of the following ways:\n";
-	cout << "a) KannadaClassifier.exe " + IMG_OPTION + " <image_path>\n";
+	cout << "a) KannadaClassifier.exe " + IMG_OPTION + " <image_path> <blocksXML_path>\n";
 	cout << "b) KannadaClassifier.exe " + MULTIPAGE_OPTION + " <image_path>\n";
 	cout << "c) KannadaClassifier.exe " + DIR_OPTION + " <path_of_directory_containing_input_images>\n";
 	cout << "d) KannadaClassifier.exe " + string("<input_xml> <output.xml> <output_filename_prefix>\n");
@@ -354,7 +360,9 @@ void processArguments(int argc, char** argv) {
 			case 1:
 				cout << "\nEnter the path of input image: ";
 				cin >> imagePath;
-				handleImageOption(imagePath);
+				cout << "\nEnter the path of blocks XML: ";
+				cin >> inputXml;
+				handleImageOption(imagePath, inputXml.c_str());
 				cout << "\nPress any key followed by Enter to continue\n";
 				cin >> tempStr;
 				break;
@@ -382,6 +390,8 @@ void processArguments(int argc, char** argv) {
 		} while (choice != 5);
 	} else if (argc == 3 && subCommand == IMG_OPTION) {
 		handleImageOption(argv[2]);
+	} else if (argc == 4 && subCommand == IMG_OPTION) {
+		handleImageOption(argv[2], argv[3]);
 	} else if (argc == 3 && subCommand == MULTIPAGE_OPTION) {
 		handleMultiPageTiffOption(argv[2]);
 	} else if (argc == 3 && subCommand == DIR_OPTION) {

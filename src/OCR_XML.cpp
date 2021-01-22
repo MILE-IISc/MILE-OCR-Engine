@@ -5,8 +5,18 @@ using namespace std;
 
 namespace IISc_KannadaClassifier {
 
-char* itoa(unsigned int num) {
-	return (char *) toString(num).c_str();
+void readBlocksFromXML(const char* inputXmlPath, vector<CvRect> *textBlocks) {
+	XMLDocument doc;
+	doc.LoadFile(inputXmlPath);
+	XMLElement* blockElement = doc.FirstChildElement("page")->FirstChildElement("block");
+	while (blockElement != 0) {
+		int rowStart = blockElement->IntAttribute("rowStart");
+		int rowEnd = blockElement->IntAttribute("rowEnd");
+		int colStart = blockElement->IntAttribute("colStart");
+		int colEnd = blockElement->IntAttribute("colEnd");
+		textBlocks->push_back(cvRect(colStart, rowStart, colEnd - colStart + 1, rowEnd - rowStart + 1));
+		blockElement = blockElement->NextSiblingElement("block");
+	}
 }
 
 void writeOcrOutputXML(OCR_Page &page, const char* outputXmlPath) {
