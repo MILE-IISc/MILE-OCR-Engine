@@ -289,21 +289,30 @@ void* handleClient(void *arg) {
 #define OCR_WORK_DIR "/tmp/ocr_work_dir"
 #define MAX_PATH_LEN 256
 	int socketId = ((unsigned long long)arg);
-	unsigned int filePrefix;
+	char filePrefix[17];
 	recv(socketId, &filePrefix, sizeof(filePrefix), 0);
-	printf("received -- %d\n", filePrefix);
-
+	printf("Received -- %s\n", filePrefix);
 
 	char inputImagePath[MAX_PATH_LEN];
-	snprintf(inputImagePath, MAX_PATH_LEN, "%s/%d.tif", OCR_WORK_DIR, filePrefix);
+	snprintf(inputImagePath, MAX_PATH_LEN, "%s/%s.tif", OCR_WORK_DIR, filePrefix);
 	char inputXmlPath[MAX_PATH_LEN];
-	snprintf(inputXmlPath, MAX_PATH_LEN, "%s/%d_input.xml", OCR_WORK_DIR, filePrefix);
+	snprintf(inputXmlPath, MAX_PATH_LEN, "%s/%s_input.xml", OCR_WORK_DIR, filePrefix);
 	char outputXmlPath[MAX_PATH_LEN];
-	snprintf(outputXmlPath, MAX_PATH_LEN, "%s/%d_output.xml", OCR_WORK_DIR, filePrefix);
+	snprintf(outputXmlPath, MAX_PATH_LEN, "%s/%s_output.xml", OCR_WORK_DIR, filePrefix);
 	handleImageOption(inputImagePath, inputXmlPath, outputXmlPath);
 
 	close(socketId);
 	return NULL;
+}
+
+const char* getServerIP() {
+	string DEFAULT_OCR_SERVER_IP = "127.0.0.1";
+	const char* ip = getenv("OCR_SERVER_IP");
+	if (ip == NULL) {
+		return DEFAULT_OCR_SERVER_IP.c_str();
+	} else {
+		return ip;
+	}
 }
 
 int getServerPortNumber() {
@@ -321,6 +330,7 @@ int startServer() {
 	struct sockaddr_in address;
 	int addrlen = sizeof(address);
 	pthread_t thread;
+	const char* serverIP = getServerIP();
 	int serverPortNumber = getServerPortNumber();
 	// Creating socket file descriptor
 	if ((serverSocketId = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
@@ -328,7 +338,7 @@ int startServer() {
 		exit(EXIT_FAILURE);
 	}
 	address.sin_family = AF_INET;
-	address.sin_addr.s_addr = inet_addr("127.0.0.1");
+	address.sin_addr.s_addr = inet_addr(serverIP);
 	address.sin_port = htons(serverPortNumber);
 
 	if (bind(serverSocketId, (struct sockaddr *)&address, sizeof(address)) < 0) {
@@ -339,7 +349,7 @@ int startServer() {
 		perror("Setting server queue size failed");
 		exit(EXIT_FAILURE);
 	}
-	printf("Listening on port %d ...\n", serverPortNumber);
+	printf("Listening on %s:%d ...\n", serverIP, serverPortNumber);
 	while(1) {
 		if ((clientSocketId = accept(serverSocketId, (struct sockaddr *)&address, (socklen_t*)&addrlen)) < 0) {
 			perror("Error while listening for socket connections");
