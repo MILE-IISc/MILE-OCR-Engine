@@ -289,42 +289,52 @@ void printMenu() {
 	cout << "\nEnter your choice number: ";
 }
 
-void* handleClient(void *arg) {
-#define OCR_WORK_DIR "/tmp"
-#define MAX_PATH_LEN 256
-	cout << "Inside handleClient\n";
-	int socketId = ((unsigned long long)arg);
-	stringstream ss;
-	ss << OCR_WORK_DIR << "/" << socketId;
-	const char *xmlFilePath = (ss.str() + ".xml").c_str();
-	const char *imagePath = (ss.str() + ".tif").c_str();
-	FILE* xmlFile = fopen(xmlFilePath, "w+");
-	if (xmlFile == NULL) {
-		perror("Error creating temp file for saving XML content:");
-		close(socketId);
-		return NULL;
+int saveNetworkDataToFile(int socketId, const char *filePath) {
+	FILE* file = fopen(filePath, "w+");
+	if (file == NULL) {
+		perror("Error saving network data to file: ");
+		return -1;
 	}
-	FILE* fp = fdopen(socketId, "r");
 	char buff[1024];
 	int bytesRead;
 	do {
-		bytesRead = fread(buff, 1, 1024, fp);
+		bytesRead = read(socketId, buff, 1024);
 		if (bytesRead < 0) {
 			perror("Error reading from network socket\n");
-			break;
+			fclose(file);
+			return -1;
 		} else if (bytesRead > 0) {
-			fwrite(buff, 1, bytesRead, xmlFile);
+			fwrite(buff, 1, bytesRead, file);
 		}
 	} while (bytesRead != 0);
-	CvRect textBlocks[100];
-	fclose(xmlFile);
-	int blockCount = readBlocksAndImageFromXML(xmlFilePath, textBlocks, imagePath);
-	// remove(xmlFilePath);
-	for (int b = 0; b < blockCount; b++) {
-		CvRect &cvRect = textBlocks[b];
-		cout << "x=" << cvRect.x << ", y=" << cvRect.y << ", width=" << cvRect.width << ", height=" << cvRect.height << "\n";
+	fclose(file);
+	return 0;
+}
+
+void* handleClient(void *arg) {
+#define OCR_WORK_DIR "/tmp"
+#define MAX_PATH_LEN 256
+	int socketId = ((unsigned long long)arg);
+	cout << "Inside new client request with socketId = " << socketId << "\n";
+
+	char basePath[MAX_PATH_LEN];
+	char inputXmlPath[MAX_PATH_LEN];
+	char inputImagePath[MAX_PATH_LEN];
+	char outputXmlPath[MAX_PATH_LEN];
+	sprintf(basePath, "%s/%d", OCR_WORK_DIR, socketId);
+	sprintf(inputXmlPath, "%s.xml", basePath);
+	sprintf(inputImagePath, "%s.tif", basePath);
+	sprintf(outputXmlPath, "%s_output.xml", basePath);
+
+	if (saveNetworkDataToFile(socketId, inputXmlPath) < 0) {
+		close(socketId);
+		return NULL;
 	}
-	// handleImageOption(imagePath, blockCount, textBlocks, outputXmlPath);
+	CvRect textBlocks[100];
+	int blockCount = readBlocksAndImageFromXML(inputXmlPath, textBlocks, inputImagePath);
+	remove(inputXmlPath);
+	handleImageOption(inputImagePath, blockCount, textBlocks, outputXmlPath);
+	remove(inputImagePath);
 	close(socketId);
 	return NULL;
 }
