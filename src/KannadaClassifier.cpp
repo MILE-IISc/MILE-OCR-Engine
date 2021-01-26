@@ -311,6 +311,27 @@ int saveNetworkDataToFile(int socketId, const char *filePath) {
 	return 0;
 }
 
+int sendFileOverNetwork(int socketId, const char *filePath) {
+	FILE *file = fopen(filePath, "r");
+	if (file == NULL) {
+		return -1;
+	}
+	char buff[1024];
+	int bytesRead;
+	do {
+		bytesRead = fread(buff, 1, 1024, file);
+		if (bytesRead < 0) {
+			perror("Error reading from file\n");
+			fclose(file);
+			return -1;
+		} else if (bytesRead > 0) {
+			write(socketId, buff, bytesRead);
+		}
+	} while (bytesRead != 0);
+	return 0;
+
+}
+
 void* handleClient(void *arg) {
 #define OCR_WORK_DIR "/tmp"
 #define MAX_PATH_LEN 256
@@ -335,6 +356,8 @@ void* handleClient(void *arg) {
 	remove(inputXmlPath);
 	handleImageOption(inputImagePath, blockCount, textBlocks, outputXmlPath);
 	remove(inputImagePath);
+	sendFileOverNetwork(socketId, outputXmlPath);
+	remove(outputXmlPath);
 	close(socketId);
 	return NULL;
 }
