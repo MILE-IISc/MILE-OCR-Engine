@@ -13,7 +13,7 @@ LDFLAGS = -lopencv_core -lopencv_highgui -lopencv_contrib -lopencv_features2d -l
 # use this command to erase files.
 RM = rm -rf
 # list of generated object files.
-OBJS = tinyxml2.o OCR_Util.o OCR_ClassLabel.o OCR_Akshara.o OCR_SegmentedComponent.o OCR_Word.o OCR_Line.o OCR_Block.o OCR_Page.o OCR_XML.o KannadaClassifier.o
+OBJS = base64.o tinyxml2.o OCR_Util.o OCR_ClassLabel.o OCR_Akshara.o OCR_SegmentedComponent.o OCR_Word.o OCR_Line.o OCR_Block.o OCR_Page.o OCR_XML.o KannadaClassifier.o
 
 # program executable file name.
 PROG = KannadaClassifier.exe

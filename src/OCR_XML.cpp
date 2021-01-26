@@ -1,13 +1,13 @@
 #include "OCR_XML.h"
+#include <stdio.h>
+#include "base64.h"
 
 using namespace tinyxml2;
 using namespace std;
 
 namespace IISc_KannadaClassifier {
 
-int readBlocksFromXML(const char* inputXmlPath, CvRect *textBlocks) {
-	XMLDocument doc;
-	doc.LoadFile(inputXmlPath);
+int readBlocksFromXML(XMLDocument &doc, CvRect *textBlocks) {
 	XMLElement* blockElement = doc.FirstChildElement("page")->FirstChildElement("block");
 	int b = 0;
 	while (blockElement != 0) {
@@ -24,6 +24,29 @@ int readBlocksFromXML(const char* inputXmlPath, CvRect *textBlocks) {
 		b++;
 	}
 	return b;
+}
+
+int readBlocksFromXML(const char* inputXmlPath, CvRect *textBlocks) {
+	XMLDocument doc;
+	doc.LoadFile(inputXmlPath);
+	return readBlocksFromXML(doc, textBlocks);
+}
+
+int readBlocksAndImageFromXML(const char *xmlFilePath, CvRect *textBlocks, const char *imageFilePath) {
+	XMLDocument doc;
+	doc.LoadFile(xmlFilePath);
+	XMLElement* imageDataElement = doc.FirstChildElement("page")->FirstChildElement("imageData");
+	const char* base64Image = imageDataElement->GetText();
+	int base64Length = strlen(base64Image);
+	cout << "Read base64 image from XML. Length = " << base64Length << "\n";
+	// cout << "----------\n" << base64Image << "\n----------\n";
+	size_t imageLength;
+	cout << "Calling base64_decode ...\n";
+	const unsigned char *image = base64_decode((const unsigned char*)base64Image, base64Length, &imageLength);
+	cout << "Decoded image. Length = " << imageLength << "\n";
+	int bytesWritten = writeDataToFile(imageFilePath, image, imageLength);
+	cout << "Saved image contents to file (bytesWritten = " << bytesWritten << "): " << imageFilePath << "\n";
+	return readBlocksFromXML(doc, textBlocks);
 }
 
 void writeOcrOutputXML(OCR_Page &page, const char* outputXmlPath) {

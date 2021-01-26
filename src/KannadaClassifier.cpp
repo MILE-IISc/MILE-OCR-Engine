@@ -203,17 +203,21 @@ string removeExtension(string fileNameFull) {
 	return fileName;
 }
 
-void handleImageOption(string imagePath, const char *blockXmlPath = NULL, const char *outputXmlPath = NULL) {
-	int blockCount = 0;
+void handleImageOption(string imagePath, int blockCount, CvRect *textBlocks, const char *outputXmlPath = NULL) {
 	vector<CvRect> textBlocksVector;
-	if (blockXmlPath != NULL) {
-		CvRect textBlocks[100];
-		blockCount = readBlocksFromXML(blockXmlPath, textBlocks);
-		for (int b = 0; b < blockCount; b++) {
-			textBlocksVector.push_back(textBlocks[b]);
-		}
+	for (int b = 0; b < blockCount; b++) {
+		textBlocksVector.push_back(textBlocks[b]);
 	}
 	performOCR(imagePath, extractFileName(imagePath), blockCount > 0 ? &textBlocksVector : NULL, NULL, outputXmlPath);
+}
+
+void handleImageOption(string imagePath, const char *blockXmlPath = NULL, const char *outputXmlPath = NULL) {
+	int blockCount = 0;
+	CvRect textBlocks[100];
+	if (blockXmlPath != NULL) {
+		blockCount = readBlocksFromXML(blockXmlPath, textBlocks);
+	}
+	handleImageOption(imagePath, blockCount, textBlocks, outputXmlPath);
 }
 
 void handleDirOption(string baseDir) {
@@ -286,21 +290,41 @@ void printMenu() {
 }
 
 void* handleClient(void *arg) {
-#define OCR_WORK_DIR "/tmp/ocr_work_dir"
+#define OCR_WORK_DIR "/tmp"
 #define MAX_PATH_LEN 256
+	cout << "Inside handleClient\n";
 	int socketId = ((unsigned long long)arg);
-	char filePrefix[17];
-	recv(socketId, &filePrefix, sizeof(filePrefix), 0);
-	printf("Received -- %s\n", filePrefix);
-
-	char inputImagePath[MAX_PATH_LEN];
-	snprintf(inputImagePath, MAX_PATH_LEN, "%s/%s.tif", OCR_WORK_DIR, filePrefix);
-	char inputXmlPath[MAX_PATH_LEN];
-	snprintf(inputXmlPath, MAX_PATH_LEN, "%s/%s_input.xml", OCR_WORK_DIR, filePrefix);
-	char outputXmlPath[MAX_PATH_LEN];
-	snprintf(outputXmlPath, MAX_PATH_LEN, "%s/%s_output.xml", OCR_WORK_DIR, filePrefix);
-	handleImageOption(inputImagePath, inputXmlPath, outputXmlPath);
-
+	stringstream ss;
+	ss << OCR_WORK_DIR << "/" << socketId;
+	const char *xmlFilePath = (ss.str() + ".xml").c_str();
+	const char *imagePath = (ss.str() + ".tif").c_str();
+	FILE* xmlFile = fopen(xmlFilePath, "w+");
+	if (xmlFile == NULL) {
+		perror("Error creating temp file for saving XML content:");
+		close(socketId);
+		return NULL;
+	}
+	FILE* fp = fdopen(socketId, "r");
+	char buff[1024];
+	int bytesRead;
+	do {
+		bytesRead = fread(buff, 1, 1024, fp);
+		if (bytesRead < 0) {
+			perror("Error reading from network socket\n");
+			break;
+		} else if (bytesRead > 0) {
+			fwrite(buff, 1, bytesRead, xmlFile);
+		}
+	} while (bytesRead != 0);
+	CvRect textBlocks[100];
+	fclose(xmlFile);
+	int blockCount = readBlocksAndImageFromXML(xmlFilePath, textBlocks, imagePath);
+	// remove(xmlFilePath);
+	for (int b = 0; b < blockCount; b++) {
+		CvRect &cvRect = textBlocks[b];
+		cout << "x=" << cvRect.x << ", y=" << cvRect.y << ", width=" << cvRect.width << ", height=" << cvRect.height << "\n";
+	}
+	// handleImageOption(imagePath, blockCount, textBlocks, outputXmlPath);
 	close(socketId);
 	return NULL;
 }

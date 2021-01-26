@@ -683,4 +683,15 @@ string extractFileName(string filePath) {
 	return fileName;
 }
 
+int writeDataToFile(const char *filePath, const unsigned char *data, size_t len) {
+	FILE* fp = fopen(filePath, "w+");
+	if (fp == NULL) {
+		perror("Error writing string to file:");
+		return -1;
+	}
+	int bytesWritten = fwrite(data, 1, len, fp);
+	fclose(fp);
+	return bytesWritten;
+}
+
 }

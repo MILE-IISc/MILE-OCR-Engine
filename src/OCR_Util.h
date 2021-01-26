@@ -115,6 +115,8 @@ string getSegmentedComponentPrefix(unsigned int segmentedComponentNum);
 void makeDirectory(string directoryName);
 string extractFileName(string filePath);
 
+int writeDataToFile(const char *filePath, const unsigned char *data, size_t len);
+
 }
 
 #endif /* OCR_UTIL_H_ */
