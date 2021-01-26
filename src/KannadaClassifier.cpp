@@ -362,16 +362,6 @@ void* handleClient(void *arg) {
 	return NULL;
 }
 
-const char* getServerIP() {
-	string DEFAULT_OCR_SERVER_IP = "127.0.0.1";
-	const char* ip = getenv("OCR_SERVER_IP");
-	if (ip == NULL) {
-		return DEFAULT_OCR_SERVER_IP.c_str();
-	} else {
-		return ip;
-	}
-}
-
 int getServerPortNumber() {
 #define DEFAULT_OCR_SERVER_PORT 8182
 	char *port = getenv("OCR_SERVER_PORT_NUMBER");
@@ -387,7 +377,6 @@ int startServer() {
 	struct sockaddr_in address;
 	int addrlen = sizeof(address);
 	pthread_t thread;
-	const char* serverIP = getServerIP();
 	int serverPortNumber = getServerPortNumber();
 	// Creating socket file descriptor
 	if ((serverSocketId = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
@@ -395,7 +384,7 @@ int startServer() {
 		exit(EXIT_FAILURE);
 	}
 	address.sin_family = AF_INET;
-	address.sin_addr.s_addr = inet_addr(serverIP);
+	address.sin_addr.s_addr = INADDR_ANY;
 	address.sin_port = htons(serverPortNumber);
 
 	if (bind(serverSocketId, (struct sockaddr *)&address, sizeof(address)) < 0) {
@@ -406,7 +395,7 @@ int startServer() {
 		perror("Setting server queue size failed");
 		exit(EXIT_FAILURE);
 	}
-	printf("Listening on %s:%d ...\n", serverIP, serverPortNumber);
+	printf("Listening on port %d ...\n", serverPortNumber);
 	while(1) {
 		if ((clientSocketId = accept(serverSocketId, (struct sockaddr *)&address, (socklen_t*)&addrlen)) < 0) {
 			perror("Error while listening for socket connections");
