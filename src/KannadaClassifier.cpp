@@ -124,7 +124,11 @@ int performOCR(string imagePath, string imageName, vector<CvRect> *textBlocks = 
 			for (unsigned int w = 0; w < words.size(); w++) {
 				outFileLog << "    Word " << (w + 1) << ": ";
 				words[w].segmentComponents();
-				words[w].splitMergedCharacters();
+				try {
+					words[w].splitMergedCharacters();
+				} catch (...) {
+					;
+				}
 				sort(words[w].segmentedComponents.begin(), words[w].segmentedComponents.end(),
 						words[w].compareSegmentedComponents);
 				words[w].combinePartCharacters();
@@ -184,7 +188,11 @@ int performOCR(string imagePath, string imageName, vector<CvRect> *textBlocks = 
 		string xmlFileName = imageDir + PATH_SEPARATOR + "output"+ ".xml";
 		writeOcrOutputXML(page, xmlFileName.c_str());
 	}
-	cvReleaseImage(&img);
+	try {
+		cvReleaseImage(&img);
+	} catch (...) {
+		;
+	}
 
 	clock_t cEnd_main = clock();
 	double timeInSecs_main = (cEnd_main - cBegin_main) / (float) CLOCKS_PER_SEC;
