@@ -62,6 +62,7 @@ void writeOcrOutputXML(OCR_Page &page, const char* outputXmlPath) {
 	for (unsigned int b = 0; b < blocks.size(); b++) {
 		XMLElement* blockElement = pageElement->InsertNewChildElement("block");
 		OCR_Block &block = blocks[b];
+		CvRect &blockRect = block.boundingBox;
 		vector<OCR_Line> &lines = block.lines;
 		for (unsigned int l = 0; l < lines.size(); l++) {
 			XMLElement* lineElement = blockElement->InsertNewChildElement("line");
@@ -84,23 +85,23 @@ void writeOcrOutputXML(OCR_Page &page, const char* outputXmlPath) {
 				}
 				wordElement->SetAttribute("unicode", toString(unicodes).c_str());
 				wordElement->SetAttribute("WordNumber", w + 1);
-				wordElement->SetAttribute("rowStart", line.lineTop);
-				wordElement->SetAttribute("rowEnd", line.lineBottom);
-				wordElement->SetAttribute("colStart", word.xStart);
-				wordElement->SetAttribute("colEnd", word.xEnd);
+				wordElement->SetAttribute("rowStart", line.lineTop + blockRect.y);
+				wordElement->SetAttribute("rowEnd", line.lineBottom + blockRect.y);
+				wordElement->SetAttribute("colStart", word.xStart + blockRect.x);
+				wordElement->SetAttribute("colEnd", word.xEnd + blockRect.x);
 			}
 			lineElement->SetAttribute("LineNumber", lineNumber++);
-			lineElement->SetAttribute("rowStart", line.lineTop);
-			lineElement->SetAttribute("rowEnd", line.lineBottom);
-			lineElement->SetAttribute("colStart", lineColStart);
-			lineElement->SetAttribute("colEnd", lineColEnd);
+			lineElement->SetAttribute("rowStart", line.lineTop + blockRect.y);
+			lineElement->SetAttribute("rowEnd", line.lineBottom + blockRect.y);
+			lineElement->SetAttribute("colStart", lineColStart + blockRect.x);
+			lineElement->SetAttribute("colEnd", lineColEnd + blockRect.x);
 		}
 		blockElement->SetAttribute("BlockNumber", b + 1);
 		blockElement->SetAttribute("type", "Text");
-		blockElement->SetAttribute("rowStart", block.boundingBox.y);
-		blockElement->SetAttribute("rowEnd", block.boundingBox.y + block.boundingBox.height - 1);
-		blockElement->SetAttribute("colStart", block.boundingBox.x);
-		blockElement->SetAttribute("colEnd", block.boundingBox.x + block.boundingBox.width - 1);
+		blockElement->SetAttribute("rowStart", blockRect.y);
+		blockElement->SetAttribute("rowEnd", blockRect.y + blockRect.height - 1);
+		blockElement->SetAttribute("colStart", blockRect.x);
+		blockElement->SetAttribute("colEnd", blockRect.x + blockRect.width - 1);
 	}
 
 	doc->SaveFile(outputXmlPath);
