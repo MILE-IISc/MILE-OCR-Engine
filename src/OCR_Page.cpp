@@ -67,7 +67,7 @@ void OCR_Page::smoothBinarizedImage(IplImage *srcImg, IplImage *dstImg) {
 
 	// Perform a morphological-close operation (dilation followed by erosion).
 	// This merges broken parts of characters as well as dots, apostrophes & other valid components inside a word.
-	cvCopyImage(outputImg, tempImg);
+	cvCopy(outputImg, tempImg);
 	IplConvKernel* structuringElement = cvCreateStructuringElementEx(11, 11, 5, 5, CV_SHAPE_RECT);
 	cvDilate(tempImg, tempImg, structuringElement);
 	cvErode(tempImg, tempImg, structuringElement);
@@ -86,7 +86,7 @@ void OCR_Page::smoothBinarizedImage(IplImage *srcImg, IplImage *dstImg) {
 	}
 	cvReleaseImage(&tempImg);
 
-	cvCopyImage(outputImg, dstImg);
+	cvCopy(outputImg, dstImg);
 	cvReleaseImage(&outputImg);
 }
 
@@ -544,7 +544,7 @@ void OCR_Page::extractTextBlocks() {
 			k++;
 		}
 		//replace original image with the textBlocksExtractedImg
-		cvCopyImage(textBlocksExtractedImg, img);
+		cvCopy(textBlocksExtractedImg, img);
 
 		if (SAVE_INTERIM_IMAGES) {
 			cvSaveImage(string(imageDir + PATH_SEPARATOR + toString(saveInterimImagesCounter++)

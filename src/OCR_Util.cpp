@@ -619,7 +619,7 @@ void binarizeNiBlack(IplImage* src, IplImage* dst, int blockSize) {
 	cvSetZero(tempImg);
 	cvResetImageROI(tempImg);
 
-	cvCopyImage(tempImg, dst);
+	cvCopy(tempImg, dst);
 	cvReleaseImage(&tempImg);
 }
 
