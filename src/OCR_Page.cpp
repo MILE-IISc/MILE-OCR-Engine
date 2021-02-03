@@ -291,6 +291,22 @@ void OCR_Page::skewCorrect() {
 	}
 }
 
+void OCR_Page::rotateImage(double rotationAngle) {
+	cout << "Rotating image by angle=" << rotationAngle << " ...";
+	outFileLog << "\nRotating image by angle=" << rotationAngle << " ...\n";
+	clock_t cBegin = clock();
+	rotateImage(img, &img, rotationAngle);
+	cvThreshold(img, img, 127, 255, CV_THRESH_BINARY);
+	clock_t cEnd = clock();
+	double timeInSecs = (cEnd - cBegin) / (float) CLOCKS_PER_SEC;
+	cout << "Image rotation complete. Time spent = " << timeInSecs << "secs\n";
+	outFileLog << "Image rotation complete. Time spent = " << timeInSecs << "secs\n";
+	if (SAVE_INTERIM_IMAGES) {
+		cvSaveImage(string(imageDir + PATH_SEPARATOR + toString(saveInterimImagesCounter++)
+				+ "_RotatedImage.tif").c_str(), img);
+	}
+}
+
 IplImage* OCR_Page::performRunLengthSmoothing(IplImage *srcImg, int rlsa_C_H, int rlsa_C_V, int rlsa_C_ALPHA) {
 	// The improvement of four-step run-length smoothing algorithm into a three-step method proposed in
 	// "Adaptive Document Block Segmentation and Classification - Frank Y. Shih and Shy-Shyan Chen" is used.

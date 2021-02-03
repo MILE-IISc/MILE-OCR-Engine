@@ -40,7 +40,7 @@ using namespace IISc_KannadaClassifier;
 bool metaDataLoaded = false;
 
 int performOCR(string imagePath, string imageName, vector<CvRect> *textBlocks = NULL,
-		char *outputFileNamePrefix = NULL, const char *outputXml = NULL) {
+		char *outputFileNamePrefix = NULL, const char *outputXml = NULL, double rotationAngle = 0.0) {
 	clock_t cBegin_main = clock();
 	imageDir = "output" + PATH_SEPARATOR + imageName + PATH_SEPARATOR;
 	makeDirectory("output");
@@ -89,6 +89,11 @@ int performOCR(string imagePath, string imageName, vector<CvRect> *textBlocks = 
 
 	OCR_Page page = OCR_Page(img);
 	page.binarize();
+	if (fabs(rotationAngle) > 0.000001) {
+		page.rotateImage(rotationAngle);
+	} else {
+		page.skewCorrect();
+	}
 	if (textBlocks != NULL && textBlocks->size() > 0) {
 		page.isBlockSegmented = true;
 		// if (isImageBackgroundWhite(page.img)) {
@@ -98,7 +103,6 @@ int performOCR(string imagePath, string imageName, vector<CvRect> *textBlocks = 
 			page.addTextBlock((*textBlocks)[b]);
 		}
 	} else {
-		page.skewCorrect();
 		page.extractTextBlocks();
 		page.saveSegmentedTextBlocks();
 	}
@@ -211,21 +215,22 @@ string removeExtension(string fileNameFull) {
 	return fileName;
 }
 
-void handleImageOption(string imagePath, int blockCount, CvRect *textBlocks, const char *outputXmlPath = NULL) {
+void handleImageOption(string imagePath, int blockCount, CvRect *textBlocks, const char *outputXmlPath = NULL, double rotationAngle = 0.0) {
 	vector<CvRect> textBlocksVector;
 	for (int b = 0; b < blockCount; b++) {
 		textBlocksVector.push_back(textBlocks[b]);
 	}
-	performOCR(imagePath, extractFileName(imagePath), blockCount > 0 ? &textBlocksVector : NULL, NULL, outputXmlPath);
+	performOCR(imagePath, extractFileName(imagePath), blockCount > 0 ? &textBlocksVector : NULL, NULL, outputXmlPath, rotationAngle);
 }
 
 void handleImageOption(string imagePath, const char *blockXmlPath = NULL, const char *outputXmlPath = NULL) {
 	int blockCount = 0;
 	CvRect textBlocks[100];
+	double rotationAngle = 0.0;
 	if (blockXmlPath != NULL) {
-		blockCount = readBlocksFromXML(blockXmlPath, textBlocks);
+		blockCount = readBlocksFromXML(blockXmlPath, textBlocks, &rotationAngle);
 	}
-	handleImageOption(imagePath, blockCount, textBlocks, outputXmlPath);
+	handleImageOption(imagePath, blockCount, textBlocks, outputXmlPath, rotationAngle);
 }
 
 void handleDirOption(string baseDir) {
@@ -360,9 +365,10 @@ void* handleClient(void *arg) {
 		return NULL;
 	}
 	CvRect textBlocks[100];
-	int blockCount = readBlocksAndImageFromXML(inputXmlPath, textBlocks, inputImagePath);
+	double rotationAngle = 0.0;
+	int blockCount = readBlocksAndImageFromXML(inputXmlPath, textBlocks, inputImagePath, &rotationAngle);
 	remove(inputXmlPath);
-	handleImageOption(inputImagePath, blockCount, textBlocks, outputXmlPath);
+	handleImageOption(inputImagePath, blockCount, textBlocks, outputXmlPath, rotationAngle);
 	remove(inputImagePath);
 	sendFileOverNetwork(socketId, outputXmlPath);
 	remove(outputXmlPath);

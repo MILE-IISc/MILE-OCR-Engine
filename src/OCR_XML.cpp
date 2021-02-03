@@ -7,8 +7,10 @@ using namespace std;
 
 namespace IISc_KannadaClassifier {
 
-int readBlocksFromXML(XMLDocument &doc, CvRect *textBlocks) {
-	XMLElement* blockElement = doc.FirstChildElement("page")->FirstChildElement("block");
+int readBlocksFromXML(XMLDocument &doc, CvRect *textBlocks, double *rotationAngle) {
+	XMLElement* pageElement = doc.FirstChildElement("page");
+	*rotationAngle = pageElement->DoubleAttribute("rotationAngle");
+	XMLElement* blockElement = pageElement->FirstChildElement("block");
 	int b = 0;
 	while (blockElement != 0) {
 		int rowStart = blockElement->IntAttribute("rowStart");
@@ -26,13 +28,13 @@ int readBlocksFromXML(XMLDocument &doc, CvRect *textBlocks) {
 	return b;
 }
 
-int readBlocksFromXML(const char* inputXmlPath, CvRect *textBlocks) {
+int readBlocksFromXML(const char* inputXmlPath, CvRect *textBlocks, double *rotationAngle) {
 	XMLDocument doc;
 	doc.LoadFile(inputXmlPath);
-	return readBlocksFromXML(doc, textBlocks);
+	return readBlocksFromXML(doc, textBlocks, rotationAngle);
 }
 
-int readBlocksAndImageFromXML(const char *xmlFilePath, CvRect *textBlocks, const char *imageFilePath) {
+int readBlocksAndImageFromXML(const char *xmlFilePath, CvRect *textBlocks, const char *imageFilePath, double *rotationAngle) {
 	XMLDocument doc;
 	doc.LoadFile(xmlFilePath);
 	XMLElement* imageDataElement = doc.FirstChildElement("page")->FirstChildElement("imageData");
@@ -46,7 +48,7 @@ int readBlocksAndImageFromXML(const char *xmlFilePath, CvRect *textBlocks, const
 	cout << "Decoded image. Length = " << imageLength << "\n";
 	int bytesWritten = writeDataToFile(imageFilePath, image, imageLength);
 	cout << "Saved image contents to file (bytesWritten = " << bytesWritten << "): " << imageFilePath << "\n";
-	return readBlocksFromXML(doc, textBlocks);
+	return readBlocksFromXML(doc, textBlocks, rotationAngle);
 }
 
 void writeOcrOutputXML(OCR_Page &page, const char* outputXmlPath) {

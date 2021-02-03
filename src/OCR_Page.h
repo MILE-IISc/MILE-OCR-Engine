@@ -24,6 +24,7 @@ public:
 	virtual ~OCR_Page();
 	void binarize();
 	void skewCorrect();
+	void rotateImage(double rotationAngle);
 	void extractTextBlocks();
 	void addTextBlock(CvRect &rect);
 	//This function saves the images of blocks, lines, words and components of the input image in the output directory
