@@ -13,7 +13,7 @@ LDFLAGS = -llinear -lsvm -ltiff -lpthread -lopencv_shape -lopencv_stitching -lop
 # use this command to erase files.
 RM = rm -rf
 # list of generated object files.
-OBJS = base64.o tinyxml2.o OCR_Util.o OCR_ClassLabel.o OCR_Akshara.o OCR_SegmentedComponent.o OCR_Word.o OCR_Line.o OCR_Block.o OCR_Page.o OCR_XML.o KannadaClassifier.o
+OBJS = CRNN_Infer.o base64.o tinyxml2.o OCR_Util.o OCR_ClassLabel.o OCR_Akshara.o OCR_SegmentedComponent.o OCR_Word.o OCR_Line.o OCR_Block.o OCR_Page.o OCR_XML.o KannadaClassifier.o
 
 # program executable file name.
 PROG = KannadaClassifier.exe

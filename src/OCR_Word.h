@@ -20,6 +20,7 @@ public:
 	int relBaseLine, lineHeight, lineMiddle, refBelowBaseLine ;
 	vector<OCR_SegmentedComponent> segmentedComponents;
 	vector<OCR_Akshara> aksharas;
+	string unicode;
 	int language;
 	short int specialAttributes; //like isBold, isItalic, isUnderline
 	string fontType;

@@ -175,11 +175,11 @@ void OCR_Block::writeUnicodesToFile(string outputFileName) {
 	for (unsigned int l = 0; l < lines.size(); l++) {
 		vector<OCR_Word> &words = lines[l].words;
 		for (unsigned int w = 0; w < words.size(); w++) {
-			vector<OCR_Akshara> &aksharas = words[w].aksharas;
+			/* vector<OCR_Akshara> &aksharas = words[w].aksharas;
 			for (unsigned int a = 0; a < aksharas.size(); a++) {
 				out << aksharas[a].unicodes;
-			}
-			out << " ";
+			} */
+			out << words[w].unicode << " ";
 		}
 		out << "\n";
 	}
