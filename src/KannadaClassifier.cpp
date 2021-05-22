@@ -34,6 +34,7 @@ using namespace std;
 #include "OCR_Block.h"
 #include "OCR_Page.h"
 #include "OCR_XML.h"
+#include "CRNN_Infer.h"
 
 using namespace IISc_KannadaClassifier;
 
@@ -127,6 +128,7 @@ int performOCR(string imagePath, string imageName, vector<CvRect> *textBlocks = 
 			outFileLog << "Words Segmented. Count = " <<words.size()<<endl;
 			for (unsigned int w = 0; w < words.size(); w++) {
 				outFileLog << "    Word " << (w + 1) << ": ";
+				/*
 				words[w].segmentComponents();
 				try {
 					words[w].splitMergedCharacters();
@@ -167,6 +169,9 @@ int performOCR(string imagePath, string imageName, vector<CvRect> *textBlocks = 
 					outFileLog << aksharas[a] << endl;
 				}
 				outFileLog << "\n";
+				*/
+				InferCRNN *crnnInfer = crnnInfer->getInstance("./kn_model/");
+				words[w].unicode = crnnInfer->infer(words[w].img);
 			}
 		}
 		// Save unicode for each text block.

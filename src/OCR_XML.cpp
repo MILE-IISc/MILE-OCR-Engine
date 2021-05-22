@@ -80,12 +80,12 @@ void writeOcrOutputXML(OCR_Page &page, const char* outputXmlPath) {
 				if (w == words.size() - 1) {
 					lineColEnd = word.xEnd;
 				}
-				vector<OCR_Akshara> &aksharas = word.aksharas;
+				/* vector<OCR_Akshara> &aksharas = word.aksharas;
 				vector<wchar_t> unicodes;
 				for (unsigned int a = 0; a < aksharas.size(); a++) {
 					copyVector(aksharas[a].unicodes, unicodes);
-				}
-				wordElement->SetAttribute("unicode", toString(unicodes).c_str());
+				} */
+				wordElement->SetAttribute("unicode", word.unicode.c_str());
 				wordElement->SetAttribute("WordNumber", w + 1);
 				wordElement->SetAttribute("rowStart", line.lineTop + blockRect.y);
 				wordElement->SetAttribute("rowEnd", line.lineBottom + blockRect.y);
