@@ -1,4 +1,5 @@
 #include "CRNN_Infer.h"
+using std::cout;
 
 namespace IISc_KannadaClassifier {
 
@@ -6,6 +7,13 @@ namespace IISc_KannadaClassifier {
 
     InferCRNN::InferCRNN (string modelPath) {
         this->modelPath = modelPath;
+        session_options.config.mutable_gpu_options()->set_allow_growth(true);
+        auto status = tensorflow::LoadSavedModel(session_options, run_options, modelPath, {"serve"}, &model);
+        if (status.ok()) {
+            cout << "Model loaded successfully...\n";
+        } else {
+            cout << "Error in loading model\n";
+        }
     }
 
     InferCRNN* InferCRNN::getInstance(string modelPath){

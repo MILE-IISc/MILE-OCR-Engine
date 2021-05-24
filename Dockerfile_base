@@ -34,4 +34,12 @@ RUN rm -rf ~/.cache
 # remove the build folder
 RUN rm -rf /opt/tensorflow_cc
 
+# Get Protocol buffers
+WORKDIR /opt
+RUN wget -c https://github.com/protocolbuffers/protobuf/releases/download/v3.9.2/protobuf-all-3.9.2.tar.gz && \
+    tar xvf protobuf-all-3.9.2.tar.gz && cd protobuf-3.9.2/ && \
+    ./configure && \
+    make && \
+    make install
+
 WORKDIR /home/ocr
