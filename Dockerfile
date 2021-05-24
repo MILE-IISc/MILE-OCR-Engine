@@ -1,11 +1,4 @@
-FROM ubuntu:18.04
-
-# install dependencies
-RUN apt-get update
-ENV DEBIAN_FRONTEND="noninteractive" TZ="Asia/Kolkata"
-RUN apt-get install -y libopencv-dev liblinear-dev libsvm-dev libtiff5-dev
-
-RUN apt-get install -y build-essential checkinstall cmake
+FROM mile-ocr-engine-base
 
 WORKDIR /home/ocr
 COPY Makefile /home/ocr/
