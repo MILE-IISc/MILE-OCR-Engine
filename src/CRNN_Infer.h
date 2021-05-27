@@ -16,6 +16,13 @@ using tensorflow::RunOptions;
 
 namespace IISc_KannadaClassifier {
 
+class CRNNModelConfig {
+public:
+	int width = 300;
+	int height = 80;
+	int timeSteps = 75;
+};
+
 class InferCRNN {
 private:
     InferCRNN (string modelPath);
@@ -24,6 +31,7 @@ private:
     SavedModelBundle model;
     SessionOptions session_options;
     RunOptions run_options;
+    CRNNModelConfig modelConfig;
 
 public:
     static InferCRNN* getInstance(string modelPath);
