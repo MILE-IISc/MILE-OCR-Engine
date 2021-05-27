@@ -8,3 +8,5 @@ output/
 /.cproject
 src/xmltest.cpp
 input/
+tensorflow-dev/
+tools
