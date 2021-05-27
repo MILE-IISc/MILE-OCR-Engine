@@ -16,7 +16,7 @@ RUN apt-get -y install pkg-config zip g++ zlib1g-dev unzip python
 # Use https://github.com/FloopCZ/tensorflow_cc to build and install tensorflow_cc
 
 # Install bazel
-ARG BAZEL_VERSION=3.1.0
+ARG BAZEL_VERSION=3.7.2
 ARG bazel_installer=bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh
 RUN wget -P /tmp https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/${bazel_installer}
 RUN chmod +x /tmp/${bazel_installer}
