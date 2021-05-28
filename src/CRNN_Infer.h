@@ -21,6 +21,7 @@ public:
 	int width = 300;
 	int height = 80;
 	int timeSteps = 75;
+	int numClasses = 178;
 };
 
 class InferCRNN {
@@ -32,6 +33,7 @@ private:
     SessionOptions session_options;
     RunOptions run_options;
     CRNNModelConfig modelConfig;
+	const float EPSILON = (float) 0.0000001;
 
 public:
     static InferCRNN* getInstance(string modelPath);

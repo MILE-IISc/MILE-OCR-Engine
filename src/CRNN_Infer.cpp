@@ -1,15 +1,20 @@
 #include "CRNN_Infer.h"
 
+#include <absl/container/inlined_vector.h>
 #include <opencv2/core/core_c.h>
 #include <opencv2/core/types_c.h>
 #include <opencv2/imgproc/imgproc_c.h>
 #include <tensorflow/core/framework/tensor.h>
 #include <tensorflow/core/framework/tensor_shape.h>
 #include <tensorflow/core/framework/types.pb.h>
+#include <tensorflow/core/platform/default/integral_types.h>
 #include <tensorflow/core/platform/status.h>
 #include <tensorflow/core/protobuf/config.pb.h>
+#include <tensorflow/core/public/session.h>
+#include <tensorflow/core/util/ctc/ctc_decoder.h>
 #include <cmath>
 #include <iostream>
+#include <vector>
 
 using std::cout;
 using namespace tensorflow;
@@ -23,7 +28,7 @@ namespace IISc_KannadaClassifier {
         session_options.config.mutable_gpu_options()->set_allow_growth(true);
         auto status = LoadSavedModel(session_options, run_options, modelPath, {"serve"}, &model);
         if (status.ok()) {
-            cout << "Model loaded successfully...\n";
+            cout << "Model loaded successfully.\n";
         } else {
             cout << "Error in loading model\n";
         }
@@ -38,11 +43,7 @@ namespace IISc_KannadaClassifier {
         return instance;
     }
 
-    string InferCRNN::infer(IplImage *img) {
-        return "";
-    }
-
-	static IplImage * resizeAndPad(IplImage* inputImage, int outputImgHeight, int outputImgWidth) {
+	static IplImage* resizeAndPad(IplImage* inputImage, int outputImgHeight, int outputImgWidth) {
 		double aspectRatio = 1.0 * inputImage->width / inputImage->height;
 		int newWidth = (int) round(1.0 * outputImgHeight / inputImage->height * inputImage->width);
 		if (aspectRatio < 8.0 && newWidth < outputImgWidth) {
@@ -66,18 +67,60 @@ namespace IISc_KannadaClassifier {
 		}
 	}
 
-	static Tensor convertImageToCRNNInput(IplImage* inputImage, CRNNModelConfig& modelConfig) {
+	static Tensor* convertImageToCRNNInput(IplImage* inputImage, CRNNModelConfig& modelConfig) {
 		IplImage* resizedImage = resizeAndPad(inputImage, modelConfig.height, modelConfig.width);
-		Tensor image_tensor(DT_FLOAT, TensorShape({ 1, modelConfig.height, modelConfig.width, 1 }));
-		// FloatNdArray ndArray = NdArrays.ofFloats(Shape.of(1, modelConfig.width, modelConfig.height, 1));
+		Tensor* image_tensor = new Tensor(DT_FLOAT, TensorShape({ 1, modelConfig.width, modelConfig.height, 1 }));
+		auto input_tensor_mapped = image_tensor->tensor<float, 4>();
+
+		// https://danishshres.medium.com/construction-of-tensorflow-tensor-with-c-a53356d4f41e
 		for (int r = 0; r < resizedImage->height; r++) {
 			for (int c = 0; c < resizedImage->width; c++) {
-				double value = cvGet2D(resizedImage, r, c) / 255.0;
+				double value = cvGet2D(resizedImage, r, c).val[0] / 255.0;
 				// Transpose and Flip
-				image_tensor(0, c, resizedImage->height - 1 - r, 0) = (float)*value;
+				input_tensor_mapped(0, c, resizedImage->height - 1 - r, 0) = (float) value;
 			}
 		}
+		cvReleaseImage(&resizedImage);
 		return image_tensor;
 	}
+
+	string InferCRNN::infer(IplImage *inputImage) {
+		Tensor* crnnInputTensor = convertImageToCRNNInput(inputImage, this->modelConfig);
+		int timeSteps = modelConfig.timeSteps;
+		int numClasses = modelConfig.numClasses;
+
+		Tensor crnnOutputTensor(DT_FLOAT, TensorShape({ 1, timeSteps, numClasses}));
+		std::vector<Tensor> crnnOutput = {crnnOutputTensor};
+		// https://medium.com/analytics-vidhya/inference-tensorflow2-model-in-c-aa73a6af41cf
+		Status runStatus = model.GetSession()->Run({{"input_1", *crnnInputTensor}}, {"fc_12"}, {}, &crnnOutput);
+		delete crnnInputTensor;
+
+		auto crnnOutputTensorMapped = crnnOutputTensor.tensor<float, 3>();
+		int prevClassIndex = -1;
+		int blankIndex = numClasses - 1;
+		std::vector<int> ctcDecodedValues;
+		double score = 0.0;
+		for (int t = 2; t < timeSteps; t++) {
+			int maxClassIndex = 0;
+			float maxValue = 0;
+			for (int c = 0; c < numClasses; c++) {
+				float value = crnnOutputTensorMapped(0, t, c);
+				if (value > maxValue) {
+					maxValue = value;
+					maxClassIndex = c;
+				}
+			}
+			score += -log(maxValue + EPSILON);
+			if (maxClassIndex != blankIndex && maxClassIndex != prevClassIndex) {
+				ctcDecodedValues.push_back(maxClassIndex);
+			}
+			prevClassIndex = maxClassIndex;
+		}
+
+		for (int c: ctcDecodedValues) {
+			cout << c << " ";
+		}
+		return "";
+    }
 
 };
