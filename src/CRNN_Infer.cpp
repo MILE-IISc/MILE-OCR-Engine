@@ -45,13 +45,13 @@ namespace IISc_KannadaClassifier {
 
 	static IplImage* resizeAndPad(IplImage* inputImage, int outputImgHeight, int outputImgWidth) {
 		double aspectRatio = 1.0 * inputImage->width / inputImage->height;
-		int newWidth = (int) round(1.0 * outputImgHeight / inputImage->height * inputImage->width);
+		int newWidth = (int) round(aspectRatio * outputImgHeight);
 		if (aspectRatio < 8.0 && newWidth < outputImgWidth) {
 			IplImage* tempImage = cvCreateImage(cvSize(newWidth, outputImgHeight), IPL_DEPTH_8U, 1);
 			cvResize(inputImage, tempImage);
 			IplImage* outputImage = cvCreateImage(cvSize(outputImgWidth, outputImgHeight), IPL_DEPTH_8U, 1);
 			for (int r = 0; r < outputImgHeight; r++) {
-				for (int c = 0; c < outputImgWidth; c++) {
+				for (int c = 0; c < newWidth; c++) {
 					cvSet2D(outputImage, r, c, cvGet2D(tempImage, r, c).val[0]);
 				}
 				for (int c = newWidth; c < outputImgWidth; c++) {
