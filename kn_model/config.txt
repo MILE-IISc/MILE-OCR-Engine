@@ -1,0 +1,3 @@
+width=300
+height=50
+timesteps=75

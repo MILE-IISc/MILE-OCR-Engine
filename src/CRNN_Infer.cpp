@@ -15,18 +15,30 @@
 #include <cmath>
 #include <iostream>
 #include <vector>
+#include <fstream>
 
-using std::cout;
+using namespace std;
 using namespace tensorflow;
 
 namespace IISc_KannadaClassifier {
 
-    std::unordered_map<string, InferCRNN*> InferCRNN::instanceMap;
+    map<string, InferCRNN*> InferCRNN::instanceMap;
+
+    void InferCRNN::loadCharactersMap(string modelPath) {
+        ifstream infile(modelPath + "./characters.txt");
+        string line;
+        int index = 0;
+        while (getline(infile, line)) {
+            charactersMap[index] = line;
+            index++;
+        }
+    }
 
     InferCRNN::InferCRNN (string modelPath) {
         this->modelPath = modelPath;
         session_options.config.mutable_gpu_options()->set_allow_growth(true);
         auto status = LoadSavedModel(session_options, run_options, modelPath, {"serve"}, &model);
+        loadCharactersMap(modelPath);
         if (status.ok()) {
             cout << "Model loaded successfully.\n";
         } else {
@@ -90,7 +102,7 @@ namespace IISc_KannadaClassifier {
 		int numClasses = modelConfig.numClasses;
 
 		Tensor crnnOutputTensor(DT_FLOAT, TensorShape({ 1, timeSteps, numClasses}));
-		std::vector<Tensor> crnnOutput = {crnnOutputTensor};
+		vector<Tensor> crnnOutput = {crnnOutputTensor};
 		// https://medium.com/analytics-vidhya/inference-tensorflow2-model-in-c-aa73a6af41cf
 		Status runStatus = model.GetSession()->Run({{"input_1", *crnnInputTensor}}, {"fc_12"}, {}, &crnnOutput);
 		delete crnnInputTensor;
@@ -98,7 +110,7 @@ namespace IISc_KannadaClassifier {
 		auto crnnOutputTensorMapped = crnnOutputTensor.tensor<float, 3>();
 		int prevClassIndex = -1;
 		int blankIndex = numClasses - 1;
-		std::vector<int> ctcDecodedValues;
+		vector<int> ctcDecodedValues;
 		double score = 0.0;
 		for (int t = 2; t < timeSteps; t++) {
 			int maxClassIndex = 0;
@@ -117,10 +129,14 @@ namespace IISc_KannadaClassifier {
 			prevClassIndex = maxClassIndex;
 		}
 
+		string outputUnicode;
 		for (int c: ctcDecodedValues) {
-			cout << c << " ";
+			map<int, string>::iterator itr = charactersMap.find(c);
+			if ( itr != charactersMap.end() ) {
+				outputUnicode += itr->second;
+			}
 		}
-		return "";
+		return outputUnicode;
     }
 
 };

@@ -7,7 +7,7 @@
 #include <opencv/cv.h>
 #include <tensorflow/cc/saved_model/loader.h>
 
-using std::unordered_map;
+using std::map;
 using std::string;
 
 using tensorflow::SavedModelBundle;
@@ -27,13 +27,15 @@ public:
 class InferCRNN {
 private:
     InferCRNN (string modelPath);
-    static unordered_map<string, InferCRNN*> instanceMap;  
+    static map<string, InferCRNN*> instanceMap;
     string modelPath;
     SavedModelBundle model;
     SessionOptions session_options;
     RunOptions run_options;
+    map<int, string> charactersMap;
     CRNNModelConfig modelConfig;
 	const float EPSILON = (float) 0.0000001;
+    void loadCharactersMap(string modelPath);
 
 public:
     static InferCRNN* getInstance(string modelPath);
