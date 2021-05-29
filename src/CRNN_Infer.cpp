@@ -28,6 +28,7 @@ namespace IISc_KannadaClassifier {
         ifstream infile(modelPath + "./characters.txt");
         string line;
         int index = 0;
+        cout << "Loading characters mapping from " << modelPath + "./characters.txt" << endl;
         while (getline(infile, line)) {
             charactersMap[index] = line;
             index++;
@@ -40,6 +41,10 @@ namespace IISc_KannadaClassifier {
         auto status = LoadSavedModel(session_options, run_options, modelPath, {"serve"}, &model);
         loadCharactersMap(modelPath);
         if (status.ok()) {
+            // https://github.com/tensorflow/tensorflow/blob/master/tensorflow/cc/saved_model/saved_model_bundle_test.cc
+            const auto& signatureDef = model.GetSignatures().at("serving_default");
+            inputTensorName = signatureDef.inputs().at("input_1").name();
+            outputTensorName = signatureDef.outputs().at("fc_12").name();
             cout << "Model loaded successfully.\n";
         } else {
             cout << "Error in loading model\n";
@@ -101,10 +106,14 @@ namespace IISc_KannadaClassifier {
 		int timeSteps = modelConfig.timeSteps;
 		int numClasses = modelConfig.numClasses;
 
-		Tensor crnnOutputTensor(DT_FLOAT, TensorShape({ 1, timeSteps, numClasses}));
-		vector<Tensor> crnnOutput = {crnnOutputTensor};
+		vector<Tensor> crnnOutput;
 		// https://medium.com/analytics-vidhya/inference-tensorflow2-model-in-c-aa73a6af41cf
-		Status runStatus = model.GetSession()->Run({{"input_1", *crnnInputTensor}}, {"fc_12"}, {}, &crnnOutput);
+		Status runStatus = model.GetSession()->Run({{inputTensorName, *crnnInputTensor}}, {outputTensorName}, {}, &crnnOutput);
+		if (!runStatus.ok()) {
+			cout << "CRNN infer failed: " << runStatus.error_message() << endl;
+			return "";
+		}
+		Tensor& crnnOutputTensor = crnnOutput[0];
 		delete crnnInputTensor;
 
 		auto crnnOutputTensorMapped = crnnOutputTensor.tensor<float, 3>();
