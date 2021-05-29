@@ -4,7 +4,7 @@ CC = g++
 LD = g++
 
 # Compiler flags go here.
-CFLAGS = -g -Wall -I ./tensorflow-dev/include/ -I ./tensorflow-dev/include/src/
+CFLAGS = -g -Wall -I /usr/include/src/
 
 # Linker flags go here. Currently there aren't any, but if we'll switch to
 # code optimization, we might add "-s" here to strip debug info and symbols.

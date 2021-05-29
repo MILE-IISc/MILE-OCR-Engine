@@ -1,4 +1,4 @@
-FROM mile-ocr-engine-base
+FROM mileiisc/tensorflow-with-opencv
 
 WORKDIR /home/ocr
 COPY Makefile /home/ocr/
