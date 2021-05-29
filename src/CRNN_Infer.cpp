@@ -36,6 +36,7 @@ namespace IISc_KannadaClassifier {
     }
 
     InferCRNN::InferCRNN (string modelPath) {
+        clock_t cBegin = clock();
         this->modelPath = modelPath;
         session_options.config.mutable_gpu_options()->set_allow_growth(true);
         auto status = LoadSavedModel(session_options, run_options, modelPath, {"serve"}, &model);
@@ -45,7 +46,9 @@ namespace IISc_KannadaClassifier {
             const auto& signatureDef = model.GetSignatures().at("serving_default");
             inputTensorName = signatureDef.inputs().at("input_1").name();
             outputTensorName = signatureDef.outputs().at("fc_12").name();
-            cout << "Model loaded successfully.\n";
+            clock_t cEnd = clock();
+            double timeInSecs = (cEnd - cBegin) / (float) CLOCKS_PER_SEC;
+            cout << "Model loaded successfully. Time spent = " << timeInSecs << "secs\n";
         } else {
             cout << "Error in loading model\n";
         }
